@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastTrack Delivery | AI-Powered Logistics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="scene-bg" aria-hidden="true">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+    <div class="grid-floor"></div>
+  </div>
+
+  <header class="site-header glass">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">FT</span>
+      <div>
+        <strong>FastTrack Delivery</strong>
+        <small>AI Logistics · Delhi NCR</small>
+      </div>
+    </div>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#home" data-page="home">Home</a>
+      <a href="#dashboard" data-page="dashboard">Dashboard</a>
+      <a href="#orders" data-page="orders">Orders</a>
+      <a href="#drivers" data-page="drivers">Drivers</a>
+      <a href="#about" data-page="about">About</a>
+      <a href="#help" data-page="help">Help</a>
+      <a href="#contact" data-page="contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="page active">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="eyebrow">Live AI routing · India-first fleet</p>
+          <h1>Delivery that feels like the future.</h1>
+          <p class="lead">Cinematic tracking, 3D route intelligence, and one-tap dispatch for last-mile operations across Delhi NCR.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#dashboard">Launch Control Room</a>
+            <a class="btn ghost" href="#orders">Create Order</a>
+          </div>
+          <div class="stats-row" id="home-stats">
+            <article class="tilt-card"><span>500+</span><label>Daily deliveries</label></article>
+            <article class="tilt-card"><span>4.8</span><label>Customer rating</label></article>
+            <article class="tilt-card"><span>30%</span><label>Faster routes</label></article>
+            <article class="tilt-card"><span>₹</span><label>INR billing</label></article>
+          </div>
+        </div>
+
+        <div class="stage" id="hero-stage">
+          <div class="stage-inner" id="stage-inner">
+            <div class="photo-stack">
+              <img
+                class="photo photo-back"
+                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1600&q=90"
+                alt="High-resolution warehouse operations"
+                width="800"
+                height="520"
+              >
+              <img
+                class="photo photo-front"
+                src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1400&q=90"
+                alt="High-resolution delivery fleet on the road"
+                width="640"
+                height="420"
+              >
+            </div>
+            <div class="cube" aria-hidden="true">
+              <div class="face front">FT</div>
+              <div class="face back"></div>
+              <div class="face right">AI</div>
+              <div class="face left"></div>
+              <div class="face top">GO</div>
+              <div class="face bottom"></div>
+            </div>
+            <div class="van" aria-hidden="true">
+              <div class="van-body"></div>
+              <div class="van-cabin"></div>
+              <div class="van-wheel w1"></div>
+              <div class="van-wheel w2"></div>
+            </div>
+            <div class="glow-ring"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="page">
+      <h2>Operations Dashboard</h2>
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="split">
+        <div class="card tilt-card">
+          <h3>AI Analysis</h3>
+          <button class="btn primary" id="btn-analyze">Run AI Analysis</button>
+          <pre id="ai-analysis" class="output"></pre>
+        </div>
+        <div class="card tilt-card">
+          <h3>Route Optimization</h3>
+          <button class="btn primary" id="btn-optimize">Optimize Pending Routes</button>
+          <pre id="route-output" class="output"></pre>
+        </div>
+      </div>
+      <div class="card tilt-card">
+        <h3>Recent Notifications</h3>
+        <ul id="notifications" class="list"></ul>
+      </div>
+    </section>
+
+    <section id="orders" class="page">
+      <h2>Order Management</h2>
+      <div class="split">
+        <form id="order-form" class="card form tilt-card">
+          <h3>Create Order</h3>
+          <label>Customer name<input name="customerName" required placeholder="Ananya Mehta"></label>
+          <label>Phone<input name="customerPhone" placeholder="+91-98765-43210"></label>
+          <label>Email<input name="customerEmail" type="email" placeholder="ananya@email.com"></label>
+          <label>Pickup address<input name="pickupAddress" required placeholder="Connaught Place, New Delhi"></label>
+          <label>Delivery address<input name="deliveryAddress" required placeholder="Lajpat Nagar, New Delhi"></label>
+          <label>Priority
+            <select name="priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </label>
+          <label>Order value (₹)<input name="orderValue" type="number" min="0" step="0.01" value="499"></label>
+          <button class="btn primary" type="submit">Create Order</button>
+          <p id="order-msg" class="msg"></p>
+        </form>
+        <div class="card tilt-card">
+          <h3>Track Order</h3>
+          <div class="inline">
+            <input id="track-id" type="number" min="1" placeholder="Order ID">
+            <button class="btn" id="btn-track">Track</button>
+            <button class="btn" id="btn-predict">AI Predict</button>
+            <button class="btn" id="btn-notify">Notify Customer</button>
+          </div>
+          <pre id="track-output" class="output"></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row-head">
+          <h3>All Orders</h3>
+          <button class="btn" id="btn-refresh-orders">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Pickup → Delivery</th>
+                <th>Priority</th>
+                <th>Value</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="drivers" class="page">
+      <h2>Driver Fleet</h2>
+      <div class="split">
+        <form id="driver-form" class="card form tilt-card">
+          <h3>Add Driver</h3>
+          <label>Name<input name="name" required placeholder="Rohit Verma"></label>
+          <label>Phone<input name="phone" required placeholder="+91-90000-11111"></label>
+          <label>Email<input name="email" type="email" placeholder="rohit@fasttrackdelivery.in"></label>
+          <label>Vehicle type<input name="vehicleType" required placeholder="Bike / Tempo / Van"></label>
+          <label>License plate<input name="licensePlate" placeholder="DL-1C-0001"></label>
+          <button class="btn primary" type="submit">Add Driver</button>
+          <p id="driver-msg" class="msg"></p>
+        </form>
+        <div class="card tilt-card">
+          <h3>Bulk Assign</h3>
+          <label>Driver ID<input id="bulk-driver" type="number" min="1"></label>
+          <label>Order IDs (comma separated)<input id="bulk-orders" placeholder="1,2"></label>
+          <button class="btn primary" id="btn-bulk">Assign</button>
+          <p id="bulk-msg" class="msg"></p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row-head">
+          <h3>Drivers</h3>
+          <button class="btn" id="btn-refresh-drivers">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Vehicle</th>
+                <th>Location</th>
+                <th>Rating</th>
+                <th>Status</th>
+                <th>Set status</th>
+              </tr>
+            </thead>
+            <tbody id="drivers-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="page">
+      <h2>About FastTrack Logistics</h2>
+      <div class="card prose tilt-card">
+        <p>FastTrack Logistics Pvt. Ltd. is an AI-powered delivery platform built for Indian last-mile operations. The system combines nearest-neighbor, time-window, cluster-first, and hybrid routing algorithms.</p>
+        <ul>
+          <li><strong>Address:</strong> A-15, Sector 62, Noida, Uttar Pradesh - 201301</li>
+          <li><strong>Phone:</strong> +91-120-4567890</li>
+          <li><strong>Email:</strong> info@fasttrackdelivery.in</li>
+          <li><strong>CIN:</strong> U63030UP2023PTC123456</li>
+          <li><strong>GST:</strong> 09ABCDE1234F1Z5</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="help" class="page">
+      <h2>Help &amp; Support</h2>
+      <div class="card prose tilt-card">
+        <ol>
+          <li>Create an order from the Orders page. An available driver is assigned automatically.</li>
+          <li>Open Dashboard and run AI analysis or route optimization.</li>
+          <li>Track an order by ID, send a customer notification, or report an emergency from the order row.</li>
+          <li>Add drivers and bulk-assign pending orders from the Drivers page.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="contact" class="page">
+      <h2>Contact</h2>
+      <div class="card prose tilt-card">
+        <p>Support: support@fasttrackdelivery.in</p>
+        <p>Phone: +91-120-4567890</p>
+        <p>Hours: Mon–Sat, 9:00 AM – 7:00 PM IST</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>FastTrack Logistics Pvt. Ltd. · Made in India</span>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

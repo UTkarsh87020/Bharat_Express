@@ -1,0 +1,15 @@
+# GitHub Setup Commands
+# Replace 'YOUR_USERNAME' with your actual GitHub username
+
+# Add the remote repository (replace YOUR_USERNAME)
+git remote add origin https://github.com/YOUR_USERNAME/fasttrack-delivery-system.git
+
+# Rename the default branch to main (GitHub's default)
+git branch -M main
+
+# Push to GitHub
+git push -u origin main
+
+# Alternative if you prefer SSH (after setting up SSH keys)
+# git remote add origin git@github.com:YOUR_USERNAME/fasttrack-delivery-system.git
+# git push -u origin main
