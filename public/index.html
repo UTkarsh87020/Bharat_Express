@@ -4,229 +4,195 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FastTrack Delivery | AI-Powered Logistics</title>
+  <link rel="icon" href="favicon.png?v=3" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
   <div class="scene-bg" aria-hidden="true">
     <div class="orb orb-a"></div>
     <div class="orb orb-b"></div>
     <div class="orb orb-c"></div>
     <div class="grid-floor"></div>
   </div>
+  <div class="scroll-progress" aria-hidden="true"><i id="scroll-bar"></i></div>
 
   <header class="site-header glass">
-    <div class="brand">
-      <span class="logo" aria-hidden="true">FT</span>
-      <div>
-        <strong>FastTrack Delivery</strong>
-        <small>AI Logistics · Delhi NCR</small>
-      </div>
-    </div>
+    <a class="brand" href="#home" aria-label="FastTrack Delivery home">
+      <img class="brand-logo" src="assets/fasttrack-logo.png" width="320" height="80" alt="FastTrack Delivery">
+    </a>
     <nav class="main-nav" aria-label="Primary">
       <a href="#home" data-page="home">Home</a>
       <a href="#dashboard" data-page="dashboard">Dashboard</a>
       <a href="#orders" data-page="orders">Orders</a>
       <a href="#drivers" data-page="drivers">Drivers</a>
+      <a href="#emergency" data-page="emergency">Emergency</a>
       <a href="#about" data-page="about">About</a>
       <a href="#help" data-page="help">Help</a>
       <a href="#contact" data-page="contact">Contact</a>
     </nav>
   </header>
 
-  <main id="main">
+  <main>
     <section id="home" class="page active landing">
-      <div class="brand-banner" id="brand-banner">
-        <div class="banner-depth" aria-hidden="true">
-          <div class="banner-layer layer-city" data-depth="12"></div>
-          <div class="banner-layer layer-road" data-depth="28"></div>
-          <div class="banner-layer layer-haze" data-depth="8"></div>
-          <div class="banner-glow"></div>
-        </div>
+      <article class="company-banner" data-parallax>
+        <img
+          class="banner-photo"
+          src="assets/fasttrack-company-banner.png"
+          alt="Aerial night view of FastTrack delivery routes glowing across Delhi NCR"
+          width="1920"
+          height="1080"
+        >
+        <div class="banner-shade"></div>
+        <div class="banner-particles" id="banner-particles" aria-hidden="true"></div>
         <div class="banner-content">
-          <div class="banner-mark" aria-hidden="true">
-            <div class="mark-ring"></div>
-            <div class="mark-cube">
-              <span>FT</span>
-            </div>
-          </div>
-          <p class="banner-kicker">FastTrack Logistics Pvt. Ltd.</p>
-          <h1>Move India at the speed of intent.</h1>
-          <p class="banner-sub">Noida headquarters. Live AI routing. A fleet that feels one step ahead of the street.</p>
-          <div class="banner-actions">
+          <p class="eyebrow">FastTrack Logistics Pvt. Ltd.</p>
+          <h1>The night city, rewritten as a living route.</h1>
+          <p class="lead">India’s last-mile network with cinematic tracking, human dispatchers, and AI that chooses the quietest road — not just the shortest one.</p>
+          <div class="hero-actions">
             <a class="btn primary" href="#dashboard">Open control room</a>
-            <a class="btn ghost" href="#story-route">Watch the route</a>
+            <button class="btn ghost" type="button" data-jump="live-map">Watch live routes</button>
           </div>
-          <ul class="banner-strip" aria-label="Company snapshot">
-            <li><strong>A-15, Sector 62</strong><span>Noida HQ</span></li>
-            <li><strong>500+</strong><span>Daily drops</span></li>
-            <li><strong>94%</strong><span>On-time</span></li>
-            <li><strong>₹ INR</strong><span>Local billing</span></li>
+          <ul class="banner-meta">
+            <li>Noida HQ · Sector 62</li>
+            <li>GST 09ABCDE1234F1Z5</li>
+            <li>500+ runs a day</li>
           </ul>
         </div>
-        <div class="banner-fleet" aria-hidden="true">
-          <div class="fleet-van van-a"></div>
-          <div class="fleet-van van-b"></div>
-          <div class="fleet-van van-c"></div>
-        </div>
-      </div>
-
-      <article class="story reveal" data-fx="rise">
-        <p class="eyebrow">Why it exists</p>
-        <h2>Last mile is messy. The screen should not be.</h2>
-        <p class="lead">Traffic, weather, and impatient customers change every twenty minutes. FastTrack reads those conditions and picks a route the way a veteran dispatcher would — only faster, and without the clipboard.</p>
+        <aside class="banner-plaque glass" aria-label="Company snapshot">
+          <strong>Company banner</strong>
+          <span>Est. 2023 · Made for Indian streets</span>
+          <span>CIN U63030UP2023PTC123456</span>
+        </aside>
+        <button class="scroll-hint" type="button" data-jump="story" aria-label="Scroll to the story">
+          <span></span> Feel the city move
+        </button>
       </article>
 
-      <article class="story story-route" id="story-route">
-        <div class="route-copy reveal" data-fx="left">
-          <p class="eyebrow">Live visualisation</p>
-          <h2>Scroll the corridor.</h2>
-          <p>As you move down the page, the NCR spine lights up: Connaught Place, Lajpat Nagar, Gurgaon Cyber City, Noida 62. Each node is a real stop our demo fleet already knows.</p>
+      <article id="story" class="story-block">
+        <div class="copy reveal">
+          <p class="eyebrow">Chapter 01 · Human rhythm</p>
+          <h2>Scroll like a rider cutting through dusk traffic.</h2>
+          <p>Each section leans, breathes, and arrives a half-beat late — the way a real courier waits at a signal, then rolls. Nothing pops. Everything eases in.</p>
         </div>
-        <div class="route-stage reveal" data-fx="depth">
-          <svg class="route-svg" viewBox="0 0 640 360" role="img" aria-label="Animated Delhi NCR delivery corridor">
-            <defs>
-              <linearGradient id="routeGlow" x1="0" x2="1">
-                <stop offset="0%" stop-color="#ff8a1e"/>
-                <stop offset="100%" stop-color="#49d7ff"/>
-              </linearGradient>
-            </defs>
-            <path class="route-base" d="M70 280 C 160 260, 180 140, 260 150 S 380 250, 470 120 S 560 80, 580 70"/>
-            <path id="route-draw" class="route-draw" d="M70 280 C 160 260, 180 140, 260 150 S 380 250, 470 120 S 560 80, 580 70"/>
-            <g class="route-nodes">
-              <g class="node" data-node="0" transform="translate(70 280)"><circle r="8"/><text x="14" y="5">Connaught Place</text></g>
-              <g class="node" data-node="1" transform="translate(260 150)"><circle r="8"/><text x="14" y="5">Lajpat Nagar</text></g>
-              <g class="node" data-node="2" transform="translate(470 120)"><circle r="8"/><text x="14" y="5">Cyber City</text></g>
-              <g class="node" data-node="3" transform="translate(580 70)"><circle r="8"/><text x="-118" y="-14">Noida 62 HQ</text></g>
-            </g>
-            <circle class="route-pulse" r="7" fill="#fff">
-              <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#route-draw"/>
-              </animateMotion>
-            </circle>
-          </svg>
-          <div class="route-hud">
-            <span id="route-status">Corridor idle</span>
-            <span id="route-eta">ETA —</span>
+        <div class="tilt-stage reveal" data-delay="120">
+          <div class="city-3d" id="city-3d" aria-hidden="true">
+            <div class="road"></div>
+            <div class="tower t1"></div>
+            <div class="tower t2"></div>
+            <div class="tower t3"></div>
+            <div class="tower t4"></div>
+            <div class="courier"></div>
+            <div class="headlight"></div>
           </div>
         </div>
       </article>
 
-      <article class="story story-algos">
-        <p class="eyebrow reveal" data-fx="rise">Four brains, one dispatch</p>
-        <h2 class="reveal" data-fx="rise">The algorithm changes with the hour.</h2>
+      <article id="live-map" class="viz-block">
+        <div class="viz-head reveal">
+          <p class="eyebrow">Chapter 02 · Live visualisation</p>
+          <h2>Three vans. One NCR. Routes that actually move.</h2>
+          <p>A schematic of tonight’s network — Connaught Place, Gurgaon, Noida — with telemetry that breathes instead of snapping.</p>
+        </div>
+        <div class="map-shell reveal" data-delay="80">
+          <canvas id="route-canvas" width="1100" height="560" aria-label="Animated route visualisation of Delhi NCR deliveries"></canvas>
+          <div class="map-legend">
+            <span class="dot saffron"></span> High priority
+            <span class="dot cyan"></span> Standard
+            <span class="dot mint"></span> Returning to hub
+          </div>
+        </div>
+      </article>
+
+      <article id="algorithms" class="algo-block">
+        <p class="eyebrow reveal">Chapter 03 · Intelligence with weight</p>
+        <h2 class="reveal">Four algorithms. One quiet decision.</h2>
         <div class="algo-grid">
-          <div class="algo-card tilt-card reveal" data-fx="up" data-delay="0">
-            <span class="algo-index">01</span>
-            <h3>Nearest neighbour</h3>
-            <p>Short hops when the bag is small. Feels like a rider who already knows the gali.</p>
-          </div>
-          <div class="algo-card tilt-card reveal" data-fx="up" data-delay="80">
-            <span class="algo-index">02</span>
-            <h3>Time window</h3>
-            <p>Rush hour logic. Urgency first, so evening traffic does not bury a hot order.</p>
-          </div>
-          <div class="algo-card tilt-card reveal" data-fx="up" data-delay="160">
-            <span class="algo-index">03</span>
-            <h3>Cluster first</h3>
-            <p>Rain and haze. Group nearby drops so the fleet does not fan out into the storm.</p>
-          </div>
-          <div class="algo-card tilt-card reveal" data-fx="up" data-delay="240">
-            <span class="algo-index">04</span>
-            <h3>Hybrid</h3>
-            <p>Cluster, then sequence. The default when the city is behaving — which is rarely.</p>
-          </div>
+          <article class="algo-card reveal" data-delay="0">
+            <div class="algo-inner">
+              <div class="algo-face">
+                <h3>Nearest neighbour</h3>
+                <p>Small drops. Short hops. The courier’s instinct.</p>
+              </div>
+              <div class="algo-face back">Used when fewer than 4 pending stops remain.</div>
+            </div>
+          </article>
+          <article class="algo-card reveal" data-delay="80">
+            <div class="algo-inner">
+              <div class="algo-face">
+                <h3>Time window</h3>
+                <p>Rush hour. Promises kept before the sky goes orange.</p>
+              </div>
+              <div class="algo-face back">Morning and evening peaks get urgency sorting.</div>
+            </div>
+          </article>
+          <article class="algo-card reveal" data-delay="160">
+            <div class="algo-inner">
+              <div class="algo-face">
+                <h3>Cluster first</h3>
+                <p>Rain. Snow. Keep riders in one neighbourhood.</p>
+              </div>
+              <div class="algo-face back">Weather clusters Delhi, Mumbai, Bengaluru, Gurgaon.</div>
+            </div>
+          </article>
+          <article class="algo-card reveal" data-delay="240">
+            <div class="algo-inner">
+              <div class="algo-face">
+                <h3>Hybrid</h3>
+                <p>Ordinary afternoons. Mix proximity with patience.</p>
+              </div>
+              <div class="algo-face back">Default when the city is neither frantic nor flooded.</div>
+            </div>
+          </article>
         </div>
       </article>
 
-      <article class="story story-fleet-3d">
-        <div class="fleet-copy reveal" data-fx="right">
-          <p class="eyebrow">Fleet in volume</p>
-          <h2>Drivers you can almost walk around.</h2>
-          <p>Cards sit in perspective. Hover and they lean like a physical tile on a glass desk — a small reminder that someone real is on the road.</p>
-        </div>
-        <div class="fleet-shelf">
-          <div class="driver-slab tilt-card reveal" data-fx="spin" data-delay="0">
-            <div class="slab-photo" style="background-image:url('https://images.unsplash.com/photo-1615906655415-dcd5b6c2d7b4?auto=format&amp;fit=crop&amp;w=900&amp;q=80')"></div>
-            <h3>Amit Singh</h3>
-            <p>Tempo · DL-8C-1234 · 4.8</p>
-          </div>
-          <div class="driver-slab tilt-card reveal" data-fx="spin" data-delay="90">
-            <div class="slab-photo" style="background-image:url('https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&amp;fit=crop&amp;w=900&amp;q=80')"></div>
-            <h3>Sunita Devi</h3>
-            <p>Scooty · DL-9S-5678 · 4.9</p>
-          </div>
-          <div class="driver-slab tilt-card reveal" data-fx="spin" data-delay="180">
-            <div class="slab-photo" style="background-image:url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&amp;fit=crop&amp;w=900&amp;q=80')"></div>
-            <h3>Night corridor</h3>
-            <p>Van lane · Sector 62 hub</p>
-          </div>
+      <article class="stats-cinematic">
+        <div class="stats-row cinematic">
+          <article class="tilt-card reveal"><span data-count="500" data-suffix="+">0</span><label>Daily deliveries</label></article>
+          <article class="tilt-card reveal" data-delay="80"><span data-count="4.8" data-decimals="1">0</span><label>Customer rating</label></article>
+          <article class="tilt-card reveal" data-delay="160"><span data-count="30" data-suffix="%">0</span><label>Faster routes</label></article>
+          <article class="tilt-card reveal" data-delay="240"><span>₹</span><label>INR billing</label></article>
         </div>
       </article>
 
-      <article class="story story-metrics">
-        <p class="eyebrow reveal" data-fx="rise">Proof in motion</p>
-        <h2 class="reveal" data-fx="rise">Numbers that fill in as you arrive.</h2>
-        <div class="metric-viz">
-          <div class="metric-row reveal" data-fx="bar">
-            <label>On-time delivery</label>
-            <div class="bar"><span data-width="94"></span></div>
-            <strong data-count="94" data-suffix="%">0%</strong>
-          </div>
-          <div class="metric-row reveal" data-fx="bar">
-            <label>Fuel saved vs static routes</label>
-            <div class="bar"><span data-width="25"></span></div>
-            <strong data-count="25" data-suffix="%">0%</strong>
-          </div>
-          <div class="metric-row reveal" data-fx="bar">
-            <label>Faster average drop</label>
-            <div class="bar"><span data-width="30"></span></div>
-            <strong data-count="30" data-suffix="%">0%</strong>
-          </div>
-          <div class="metric-row reveal" data-fx="bar">
-            <label>Customer rating</label>
-            <div class="bar"><span data-width="96"></span></div>
-            <strong data-count="4.8" data-suffix="/5">0</strong>
-          </div>
+      <article class="cta-strip reveal">
+        <div>
+          <h2>Step into the control room.</h2>
+          <p>Create an order, assign a rider, watch the AI pick a path.</p>
         </div>
-      </article>
-
-      <article class="story story-cta reveal" data-fx="scale">
-        <h2>The control room is already warm.</h2>
-        <p>Create an order, assign a driver, and watch the same AI the banner promises — running on this machine, in rupees, with Indian names.</p>
-        <a class="btn primary" href="#dashboard">Launch operations</a>
+        <a class="btn primary" href="#orders">Create order</a>
       </article>
     </section>
 
     <section id="dashboard" class="page">
-      <h2>Operations Dashboard</h2>
+      <h2 class="reveal">Operations Dashboard</h2>
       <div class="kpi-grid" id="kpi-grid"></div>
       <div class="split">
-        <div class="card tilt-card">
+        <div class="card tilt-card reveal">
           <h3>AI Analysis</h3>
           <button class="btn primary" id="btn-analyze">Run AI Analysis</button>
           <pre id="ai-analysis" class="output"></pre>
         </div>
-        <div class="card tilt-card">
+        <div class="card tilt-card reveal" data-delay="80">
           <h3>Route Optimization</h3>
           <button class="btn primary" id="btn-optimize">Optimize Pending Routes</button>
           <pre id="route-output" class="output"></pre>
         </div>
       </div>
-      <div class="card tilt-card">
+      <div class="card tilt-card reveal">
         <h3>Recent Notifications</h3>
         <ul id="notifications" class="list"></ul>
       </div>
     </section>
 
     <section id="orders" class="page">
-      <h2>Order Management</h2>
+      <h2 class="reveal">Order Management</h2>
       <div class="split">
-        <form id="order-form" class="card form tilt-card">
+        <form id="order-form" class="card form tilt-card reveal">
           <h3>Create Order</h3>
           <label>Customer name<input name="customerName" required placeholder="Ananya Mehta"></label>
           <label>Phone<input name="customerPhone" placeholder="+91-98765-43210"></label>
@@ -241,10 +207,31 @@
             </select>
           </label>
           <label>Order value (₹)<input name="orderValue" type="number" min="0" step="0.01" value="499"></label>
+          <fieldset class="route-choice">
+            <legend>Safety route for this booking</legend>
+            <label class="choice-card">
+              <input type="radio" name="routePreference" value="fasttrack" checked>
+              <span>
+                <strong>FastTrack own route</strong>
+                AI / dispatcher picks the fastest trusted path.
+              </span>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="routePreference" value="customer">
+              <span>
+                <strong>Customer sets own route</strong>
+                You lock via-points so the rider cannot take a shortcut.
+              </span>
+            </label>
+          </fieldset>
+          <label id="custom-route-wrap" class="custom-route-wrap" hidden>
+            Safety via-points (one per line)
+            <textarea name="customWaypoints" rows="3" placeholder="India Gate, New Delhi&#10;AIIMS Flyover, New Delhi"></textarea>
+          </label>
           <button class="btn primary" type="submit">Create Order</button>
           <p id="order-msg" class="msg"></p>
         </form>
-        <div class="card tilt-card">
+        <div class="card tilt-card reveal" data-delay="90">
           <h3>Track Order</h3>
           <div class="inline">
             <input id="track-id" type="number" min="1" placeholder="Order ID">
@@ -253,9 +240,10 @@
             <button class="btn" id="btn-notify">Notify Customer</button>
           </div>
           <pre id="track-output" class="output"></pre>
+          <iframe id="track-map" class="track-map" title="Google Map of the booked route" hidden></iframe>
         </div>
       </div>
-      <div class="card">
+      <div class="card reveal">
         <div class="row-head">
           <h3>All Orders</h3>
           <button class="btn" id="btn-refresh-orders">Refresh</button>
@@ -270,6 +258,7 @@
                 <th>Priority</th>
                 <th>Value</th>
                 <th>Status</th>
+                <th>Route</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -280,9 +269,9 @@
     </section>
 
     <section id="drivers" class="page">
-      <h2>Driver Fleet</h2>
+      <h2 class="reveal">Driver Fleet</h2>
       <div class="split">
-        <form id="driver-form" class="card form tilt-card">
+        <form id="driver-form" class="card form tilt-card reveal">
           <h3>Add Driver</h3>
           <label>Name<input name="name" required placeholder="Rohit Verma"></label>
           <label>Phone<input name="phone" required placeholder="+91-90000-11111"></label>
@@ -292,7 +281,7 @@
           <button class="btn primary" type="submit">Add Driver</button>
           <p id="driver-msg" class="msg"></p>
         </form>
-        <div class="card tilt-card">
+        <div class="card tilt-card reveal" data-delay="90">
           <h3>Bulk Assign</h3>
           <label>Driver ID<input id="bulk-driver" type="number" min="1"></label>
           <label>Order IDs (comma separated)<input id="bulk-orders" placeholder="1,2"></label>
@@ -300,7 +289,7 @@
           <p id="bulk-msg" class="msg"></p>
         </div>
       </div>
-      <div class="card">
+      <div class="card reveal">
         <div class="row-head">
           <h3>Drivers</h3>
           <button class="btn" id="btn-refresh-drivers">Refresh</button>
@@ -324,9 +313,57 @@
       </div>
     </section>
 
+    <section id="emergency" class="page">
+      <div class="emergency-head reveal">
+        <div>
+          <p class="eyebrow">Safety · Google Maps</p>
+          <h2>Emergency path to nearest police</h2>
+          <p class="lead">We use your live location, pick the closest station, and draw the latest Google driving route on the map.</p>
+        </div>
+        <div class="emergency-actions">
+          <a class="btn danger" id="dial-112" href="tel:112">Call 112</a>
+          <button class="btn primary" type="button" id="btn-refresh-police">Refresh live route</button>
+        </div>
+      </div>
+      <p id="emergency-status" class="msg" role="status">Preparing Google Map…</p>
+      <div class="emergency-layout">
+        <div class="map-frame">
+          <iframe
+            id="police-map"
+            title="Google Map route to nearest police station"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <aside class="emergency-panel">
+          <article class="card nearest-card">
+            <p class="eyebrow">Nearest station</p>
+            <h3 id="nearest-name">Locating…</h3>
+            <p id="nearest-address"></p>
+            <p id="nearest-meta" class="muted"></p>
+            <div class="inline">
+              <a class="btn primary" id="open-gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener">Open in Google Maps</a>
+              <a class="btn" id="nearest-phone" href="tel:100">Call station</a>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Other nearby stations</h3>
+            <p class="muted">Tap a station to redraw the Google path.</p>
+            <div id="station-list" class="station-list"></div>
+          </article>
+          <article class="card form">
+            <h3>Log SOS to control room</h3>
+            <label>Linked order ID (optional)<input id="sos-order-id" type="number" min="1" placeholder="e.g. 1"></label>
+            <button class="btn danger" type="button" id="btn-sos-log">Send SOS + keep map route</button>
+          </article>
+        </aside>
+      </div>
+    </section>
+
     <section id="about" class="page">
-      <h2>About FastTrack Logistics</h2>
-      <div class="card prose tilt-card">
+      <h2 class="reveal">About FastTrack Logistics</h2>
+      <div class="card prose tilt-card reveal">
         <p>FastTrack Logistics Pvt. Ltd. is an AI-powered delivery platform built for Indian last-mile operations. The system combines nearest-neighbor, time-window, cluster-first, and hybrid routing algorithms.</p>
         <ul>
           <li><strong>Address:</strong> A-15, Sector 62, Noida, Uttar Pradesh - 201301</li>
@@ -339,20 +376,20 @@
     </section>
 
     <section id="help" class="page">
-      <h2>Help &amp; Support</h2>
-      <div class="card prose tilt-card">
+      <h2 class="reveal">Help &amp; Support</h2>
+      <div class="card prose tilt-card reveal">
         <ol>
-          <li>Create an order from the Orders page. An available driver is assigned automatically.</li>
+          <li>On booking, choose <strong>FastTrack own route</strong> or <strong>Customer sets own route</strong> (via-points for safety). On dispatch, pick which of those two paths the rider must follow.</li>
           <li>Open Dashboard and run AI analysis or route optimization.</li>
-          <li>Track an order by ID, send a customer notification, or report an emergency from the order row.</li>
+          <li>Track an order by ID, or tap SOS to open Emergency — Google Maps shows the latest path to the nearest police station.</li>
           <li>Add drivers and bulk-assign pending orders from the Drivers page.</li>
         </ol>
       </div>
     </section>
 
     <section id="contact" class="page">
-      <h2>Contact</h2>
-      <div class="card prose tilt-card">
+      <h2 class="reveal">Contact</h2>
+      <div class="card prose tilt-card reveal">
         <p>Support: support@fasttrackdelivery.in</p>
         <p>Phone: +91-120-4567890</p>
         <p>Hours: Mon–Sat, 9:00 AM – 7:00 PM IST</p>
@@ -362,7 +399,13 @@
 
   <footer class="site-footer">
     <span>FastTrack Logistics Pvt. Ltd. · Made in India</span>
+    <p id="server-note" class="server-note" hidden>
+      The local server is not running. Open a terminal in this project, run <code>npm start</code>, then visit
+      <a href="http://localhost:3000">http://localhost:3000</a> (do not open index.html from the folder).
+    </p>
   </footer>
+  <script src="motion.js"></script>
   <script src="script.js"></script>
+  <script src="emergency.js"></script>
 </body>
 </html>

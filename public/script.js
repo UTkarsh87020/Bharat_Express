@@ -7,8 +7,13 @@ const api = (path, options = {}) =>
     if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
     return data;
   });
+window.api = api;
 
 function showPage(name) {
+  if (window.FTMotion) {
+    window.FTMotion.showPage(name);
+    return;
+  }
   document.querySelectorAll(".page").forEach((page) => {
     page.classList.toggle("active", page.id === name);
   });
@@ -46,8 +51,15 @@ async function loadOrders() {
   const data = await api("/api/orders");
   const body = document.getElementById("orders-body");
   body.innerHTML = data.data
-    .map(
-      (order) => `
+    .map((order) => {
+      const booked = order.routePreference === "customer" ? "Customer path" : "FastTrack path";
+      const live = order.dispatchRouteMode
+        ? order.dispatchRouteMode === "customer"
+          ? "Riding customer path"
+          : "Riding FastTrack path"
+        : "Not dispatched";
+      const pillClass = (order.dispatchRouteMode || order.routePreference) === "customer" ? "customer" : "fasttrack";
+      return `
       <tr>
         <td>${order.id}</td>
         <td>${order.customerName}<br><small>${order.customerPhone}</small></td>
@@ -56,12 +68,20 @@ async function loadOrders() {
         <td>₹${Number(order.orderValue || 0).toFixed(2)}</td>
         <td>${order.status}</td>
         <td>
-          <button class="btn" data-status="${order.id}:out-for-delivery">Out</button>
-          <button class="btn" data-status="${order.id}:completed">Done</button>
-          <button class="btn danger" data-emergency="${order.id}">SOS</button>
+          <span class="route-pill ${pillClass}">${booked}</span><br>
+          <small>${live}</small>
         </td>
-      </tr>`
-    )
+        <td>
+          <div class="dispatch-row">
+            <button class="btn" data-dispatch="${order.id}:fasttrack">Dispatch own route</button>
+            <button class="btn" data-dispatch="${order.id}:customer">Dispatch customer route</button>
+            <button class="btn" data-status="${order.id}:out-for-delivery">Out</button>
+            <button class="btn" data-status="${order.id}:completed">Done</button>
+            <button class="btn danger" data-emergency="${order.id}">SOS</button>
+          </div>
+        </td>
+      </tr>`;
+    })
     .join("");
 }
 
@@ -100,50 +120,32 @@ async function loadNotifications() {
     .join("");
 }
 
-window.addEventListener("hashchange", () => {
-  const page = (location.hash || "#home").slice(1) || "home";
-  showPage(page);
-});
-
-function bindTilt(card) {
-  if (card.dataset.tiltBound === "true") return;
-  card.dataset.tiltBound = "true";
-  card.addEventListener("mousemove", (event) => {
-    const bounds = card.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    card.style.transform = `rotateY(${x * 10}deg) rotateX(${y * -8}deg) translateZ(8px)`;
-  });
-  card.addEventListener("mouseleave", () => {
-    card.style.transform = "";
-  });
+function setup3dEffects() {
+  if (window.FTMotion) window.FTMotion.setup3dEffects();
 }
 
-function setup3dEffects() {
-  const stage = document.getElementById("hero-stage");
-  const inner = document.getElementById("stage-inner");
-  if (stage && inner && stage.dataset.tiltBound !== "true" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    stage.dataset.tiltBound = "true";
-    stage.addEventListener("mousemove", (event) => {
-      const bounds = stage.getBoundingClientRect();
-      const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-      const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-      inner.style.transform = `rotateY(${x * 28}deg) rotateX(${y * -16}deg)`;
-    });
-    stage.addEventListener("mouseleave", () => {
-      inner.style.transform = "rotateY(0deg) rotateX(0deg)";
-    });
+async function refreshDashboard() {
+  const note = document.getElementById("server-note");
+  try {
+    await Promise.all([loadAnalytics(), loadOrders(), loadDrivers(), loadNotifications()]);
+    if (note) note.hidden = true;
+  } catch (error) {
+    console.warn("Could not load live data", error);
+    if (note) note.hidden = false;
   }
+}
 
-  document.querySelectorAll(".tilt-card").forEach(bindTilt);
+function on(id, eventName, handler) {
+  const node = document.getElementById(id);
+  if (node) node.addEventListener(eventName, handler);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  showPage((location.hash || "#home").slice(1) || "home");
+  if (!window.FTMotion) showPage((location.hash || "#home").slice(1) || "home");
   setup3dEffects();
-  await Promise.all([loadAnalytics(), loadOrders(), loadDrivers(), loadNotifications()]);
+  await refreshDashboard();
 
-  document.getElementById("btn-analyze").addEventListener("click", async () => {
+  on("btn-analyze", "click", async () => {
     const out = document.getElementById("ai-analysis");
     try {
       out.textContent = formatJson(await api("/api/ai/analyze"));
@@ -152,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("btn-optimize").addEventListener("click", async () => {
+  on("btn-optimize", "click", async () => {
     const out = document.getElementById("route-output");
     try {
       out.textContent = formatJson(await api("/api/route/optimize"));
@@ -161,22 +163,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("order-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const form = event.target;
-    const payload = Object.fromEntries(new FormData(form).entries());
-    const msg = document.getElementById("order-msg");
-    try {
-      const result = await api("/api/orders", { method: "POST", body: JSON.stringify(payload) });
-      msg.textContent = result.message;
-      form.reset();
-      await Promise.all([loadOrders(), loadAnalytics(), loadDrivers(), loadNotifications()]);
-    } catch (error) {
-      msg.textContent = error.message;
-    }
-  });
+  const orderForm = document.getElementById("order-form");
+  const customRouteWrap = document.getElementById("custom-route-wrap");
+  function syncRouteFields() {
+    if (!orderForm || !customRouteWrap) return;
+    const choice = orderForm.querySelector('input[name="routePreference"]:checked');
+    customRouteWrap.hidden = !(choice && choice.value === "customer");
+  }
+  if (orderForm) {
+    orderForm.addEventListener("change", syncRouteFields);
+    syncRouteFields();
+    orderForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const payload = Object.fromEntries(new FormData(form).entries());
+      const msg = document.getElementById("order-msg");
+      try {
+        const result = await api("/api/orders", { method: "POST", body: JSON.stringify(payload) });
+        msg.textContent = result.message;
+        form.reset();
+        syncRouteFields();
+        await refreshDashboard();
+      } catch (error) {
+        msg.textContent = error.message;
+      }
+    });
+  }
 
-  document.getElementById("driver-form").addEventListener("submit", async (event) => {
+  on("driver-form", "submit", async (event) => {
     event.preventDefault();
     const form = event.target;
     const payload = Object.fromEntries(new FormData(form).entries());
@@ -191,20 +205,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("btn-refresh-orders").addEventListener("click", loadOrders);
-  document.getElementById("btn-refresh-drivers").addEventListener("click", loadDrivers);
+  on("btn-refresh-orders", "click", loadOrders);
+  on("btn-refresh-drivers", "click", loadDrivers);
 
-  document.getElementById("btn-track").addEventListener("click", async () => {
+  on("btn-track", "click", async () => {
     const id = document.getElementById("track-id").value;
     const out = document.getElementById("track-output");
+    const map = document.getElementById("track-map");
     try {
-      out.textContent = formatJson(await api(`/api/track/${id}`));
+      const payload = await api(`/api/track/${id}`);
+      out.textContent = formatJson(payload);
+      if (payload.data && payload.data.map && payload.data.map.mapEmbedUrl && map) {
+        map.hidden = false;
+        map.src = payload.data.map.mapEmbedUrl;
+      }
     } catch (error) {
-      out.textContent = error.message;
+      if (out) out.textContent = error.message;
+      if (map) map.hidden = true;
     }
   });
 
-  document.getElementById("btn-predict").addEventListener("click", async () => {
+  on("btn-predict", "click", async () => {
     const id = document.getElementById("track-id").value;
     const out = document.getElementById("track-output");
     try {
@@ -214,7 +235,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("btn-notify").addEventListener("click", async () => {
+  on("btn-notify", "click", async () => {
     const id = document.getElementById("track-id").value;
     const out = document.getElementById("track-output");
     try {
@@ -225,7 +246,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("btn-bulk").addEventListener("click", async () => {
+  on("btn-bulk", "click", async () => {
     const msg = document.getElementById("bulk-msg");
     const driverId = Number(document.getElementById("bulk-driver").value);
     const orderIds = document
@@ -245,10 +266,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("orders-body").addEventListener("click", async (event) => {
+  on("orders-body", "click", async (event) => {
+    const dispatchBtn = event.target.closest("[data-dispatch]");
     const statusBtn = event.target.closest("[data-status]");
     const emergencyBtn = event.target.closest("[data-emergency]");
     try {
+      if (dispatchBtn) {
+        const [id, routeMode] = dispatchBtn.dataset.dispatch.split(":");
+        const result = await api(`/api/orders/${id}/dispatch`, {
+          method: "POST",
+          body: JSON.stringify({ routeMode }),
+        });
+        alert(result.message);
+        document.getElementById("track-id").value = id;
+        const map = document.getElementById("track-map");
+        if (result.map && result.map.mapEmbedUrl) {
+          map.hidden = false;
+          map.src = result.map.mapEmbedUrl;
+        }
+        await Promise.all([loadOrders(), loadAnalytics(), loadNotifications()]);
+      }
       if (statusBtn) {
         const [id, status] = statusBtn.dataset.status.split(":");
         await api(`/api/orders/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) });
@@ -258,8 +295,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const orderId = emergencyBtn.dataset.emergency;
         await api(`/api/emergency/${orderId}`, {
           method: "POST",
-          body: JSON.stringify({ type: "delay", description: "Reported from dashboard" }),
+          body: JSON.stringify({ type: "sos", description: "Reported from dashboard — opening police route" }),
         });
+        sessionStorage.setItem("ft-emergency-order", orderId);
+        location.hash = "emergency";
         await loadNotifications();
       }
     } catch (error) {
@@ -267,7 +306,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  document.getElementById("drivers-body").addEventListener("click", async (event) => {
+  on("drivers-body", "click", async (event) => {
     const button = event.target.closest("[data-driver-status]");
     if (!button) return;
     const [id, status] = button.dataset.driverStatus.split(":");
