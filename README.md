@@ -4,11 +4,12 @@
 
 ![FastTrack Delivery](https://img.shields.io/badge/FastTrack-Delivery-blue?style=for-the-badge&logo=truck)
 ![AI Powered](https://img.shields.io/badge/AI-Powered-green?style=for-the-badge&logo=brain)
+[![Deployed on Render](https://img.shields.io/badge/Render-Live%20App-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://fasttrack-delivery.onrender.com/)
 ![Made in India](https://img.shields.io/badge/Made%20in-India-orange?style=for-the-badge&logo=india)
 
 **India's Premier AI-Powered Delivery Management System**
 
-[🌐 Live Demo](http://localhost:3000) • [📖 Documentation](#documentation) • [🚀 Quick Start](#quick-start) • [🤖 AI Features](#ai-features)
+[🚀 Live Demo (Render)](https://fasttrack-delivery.onrender.com/) • [📖 Documentation](#-api-documentation) • [⚡ Quick Start](#-quick-start) • [🤖 AI Features](#-ai-features)
 
 </div>
 
@@ -87,23 +88,24 @@ Architecture: RESTful API with modular, scalable design
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/fasttrack-delivery-system.git
-cd fasttrack-delivery-system
+git clone https://github.com/UTkarsh87020/FastTrack-Delivery.git
+cd FastTrack-Delivery
 
 # Install dependencies
 npm install
 
-# Start the application
+# Start the application locally
 npm start
 ```
 
 ### Access the Application
-- **🌐 Main Website**: http://localhost:3000
-- **🏠 Home Dashboard**: http://localhost:3000#home
-- **ℹ️ About Page**: http://localhost:3000#about
-- **❓ Help & Support**: http://localhost:3000#help
-- **📞 Contact**: http://localhost:3000#contact
-- **🔧 API Health**: http://localhost:3000/api/health
+- **🌐 Live Online (Render)**: [https://fasttrack-delivery.onrender.com/](https://fasttrack-delivery.onrender.com/)
+- **💻 Local Development**: http://localhost:3000
+- **🏠 Home Dashboard**: https://fasttrack-delivery.onrender.com/#home
+- **ℹ️ About Page**: https://fasttrack-delivery.onrender.com/#about
+- **❓ Help & Support**: https://fasttrack-delivery.onrender.com/#help
+- **📞 Contact**: https://fasttrack-delivery.onrender.com/#contact
+- **🔧 API Health**: https://fasttrack-delivery.onrender.com/api/orders
 
 ## 🤖 AI Features
 
@@ -256,6 +258,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 *Transforming logistics through AI innovation, local expertise, and customer-first approach.*
 
-[![Made with ❤️ in India](https://img.shields.io/badge/Made%20with%20❤️%20in-India-orange?style=for-the-badge)](https://github.com/YOUR_USERNAME/fasttrack-delivery-system)
+[![Made with ❤️ in India](https://img.shields.io/badge/Made%20with%20❤️%20in-India-orange?style=for-the-badge)](https://github.com/UTkarsh87020/FastTrack-Delivery)
 
 </div>
