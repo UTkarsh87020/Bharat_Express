@@ -35,7 +35,7 @@ function loadEnvFile() {
 loadEnvFile();
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3005;
 const HOST = process.env.HOST || "0.0.0.0";
 
 // Initialize AI Service
@@ -871,11 +871,24 @@ app.post('/api/emergency/:orderId', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, HOST, () => {
+// Start server with fallback if port is in use
+const server = app.listen(PORT, HOST, () => {
   console.log(`🚚 Smart Delivery API running on http://localhost:${PORT}`);
-  console.log(`📱 Open http://localhost:${PORT} in your browser (not the HTML file on disk)`);
+  console.log(`📱 Open http://localhost:${PORT} in your browser`);
   console.log(`🔧 API endpoints available at http://localhost:${PORT}/api/`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    const nextPort = PORT + 1;
+    console.warn(`Port ${PORT} in use, trying http://localhost:${nextPort}...`);
+    app.listen(nextPort, HOST, () => {
+      console.log(`🚚 Smart Delivery API running on http://localhost:${nextPort}`);
+      console.log(`📱 Open http://localhost:${nextPort} in your browser`);
+    });
+  } else {
+    throw err;
+  }
 });
 
 module.exports = app;

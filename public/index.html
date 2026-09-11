@@ -3,409 +3,1095 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FastTrack Delivery | AI-Powered Logistics</title>
-  <link rel="icon" href="favicon.png?v=3" type="image/png" sizes="192x192">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=3">
+  <title>Bharat Express | Operations Dashboard</title>
+  <link rel="icon" href="assets/bharat-express-logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/bharat-express-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <!-- Leaflet CSS for Dark Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <div class="scene-bg" aria-hidden="true">
-    <div class="orb orb-a"></div>
-    <div class="orb orb-b"></div>
-    <div class="orb orb-c"></div>
-    <div class="grid-floor"></div>
-  </div>
-  <div class="scroll-progress" aria-hidden="true"><i id="scroll-bar"></i></div>
+<body class="dashboard-body">
 
-  <header class="site-header glass">
-    <a class="brand" href="#home" aria-label="FastTrack Delivery home">
-      <img class="brand-logo" src="assets/fasttrack-logo.png" width="320" height="80" alt="FastTrack Delivery">
-    </a>
-    <nav class="main-nav" aria-label="Primary">
-      <a href="#home" data-page="home">Home</a>
-      <a href="#dashboard" data-page="dashboard">Dashboard</a>
-      <a href="#orders" data-page="orders">Orders</a>
-      <a href="#drivers" data-page="drivers">Drivers</a>
-      <a href="#emergency" data-page="emergency">Emergency</a>
-      <a href="#about" data-page="about">About</a>
-      <a href="#help" data-page="help">Help</a>
-      <a href="#contact" data-page="contact">Contact</a>
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <!-- Bharat Express Logo -->
+      <a href="#" class="brand-logo" id="brand-home" data-tab="home">
+        <div class="logo-icon brand-logo-img-wrap">
+          <img src="assets/bharat-express-logo.png" alt="Bharat Express Logo" class="brand-logo-img">
+        </div>
+        <span class="brand-text">
+          <span class="text-bharat">Bharat</span>
+          <span class="text-express">Express</span>
+        </span>
+      </a>
+
+      <!-- Date & Time Display -->
+      <div class="datetime-pill">
+        <div class="time-text" id="live-time">10:45 AM</div>
+        <div class="date-text" id="live-date">14 OCT 2023</div>
+      </div>
+    </div>
+
+    <!-- Center Navigation Tabs -->
+    <nav class="nav-center" aria-label="Main Navigation">
+      <button class="nav-tab" data-tab="home">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 8.5L10 3L17 8.5V16C17 16.5 16.5 17 16 17H4C3.5 17 3 16.5 3 16V8.5Z"/>
+          <path d="M7.5 17V10.5H12.5V17"/>
+        </svg>
+        <span>Home</span>
+      </button>
+
+      <button class="nav-tab active" data-tab="dashboard">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor">
+          <rect x="3" y="3" width="6" height="6" rx="1.5"/>
+          <rect x="11" y="3" width="6" height="6" rx="1.5"/>
+          <rect x="3" y="11" width="6" height="6" rx="1.5"/>
+          <rect x="11" y="11" width="6" height="6" rx="1.5"/>
+        </svg>
+        <span>Dashboard</span>
+      </button>
+
+      <button class="nav-tab" data-tab="maps">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M10 2.5C7.24 2.5 5 4.74 5 7.5C5 11.25 10 17.5 10 17.5C10 17.5 15 11.25 15 7.5C15 4.74 12.76 2.5 10 2.5Z"/>
+          <circle cx="10" cy="7.5" r="2.5"/>
+        </svg>
+        <span>Maps</span>
+      </button>
+
+      <button class="nav-tab" data-tab="routes">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="5" cy="15" r="2"/>
+          <circle cx="15" cy="5" r="2"/>
+          <circle cx="8" cy="7" r="1.5"/>
+          <path d="M6.5 13.5L7.5 8.5C8 6 12 6 13.5 5"/>
+        </svg>
+        <span>Routes</span>
+      </button>
+
+      <button class="nav-tab" data-tab="fleet">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="5" width="10" height="8" rx="1.5"/>
+          <path d="M12 8H16L18 11V13H12V8Z"/>
+          <circle cx="5.5" cy="14.5" r="1.8"/>
+          <circle cx="15.5" cy="14.5" r="1.8"/>
+        </svg>
+        <span>Fleet</span>
+      </button>
+
+      <button class="nav-tab" data-tab="analytics">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor">
+          <rect x="3" y="11" width="3" height="6" rx="1"/>
+          <rect x="8.5" y="6" width="3" height="11" rx="1"/>
+          <rect x="14" y="3" width="3" height="14" rx="1"/>
+        </svg>
+        <span>Analytics</span>
+      </button>
+
+      <button class="nav-tab" data-tab="settings">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="10" cy="10" r="3"/>
+          <path d="M16 10C16 9.4 15.9 8.9 15.8 8.4L17.5 7.1L15.9 4.3L13.9 5.1C13.3 4.6 12.6 4.3 11.9 4.1L11.6 2H8.4L8.1 4.1C7.4 4.3 6.7 4.6 6.1 5.1L4.1 4.3L2.5 7.1L4.2 8.4C4.1 8.9 4 9.4 4 10C4 10.6 4.1 11.1 4.2 11.6L2.5 12.9L4.1 15.7L6.1 14.9C6.7 15.4 7.4 15.7 8.1 15.9L8.4 18H11.6L11.9 15.9C12.6 15.7 13.3 15.4 13.9 14.9L15.9 15.7L17.5 12.9L15.8 11.6C15.9 11.1 16 10.6 16 10Z"/>
+        </svg>
+        <span>Settings</span>
+      </button>
     </nav>
+
+    <!-- Admin User Profile -->
+    <div class="nav-right">
+      <div class="user-pill" id="user-profile-btn">
+        <div class="avatar-circle">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <span class="user-label">Admin: <strong class="user-name">Alex Chen</strong></span>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <section id="home" class="page active landing">
-      <article class="company-banner" data-parallax>
-        <img
-          class="banner-photo"
-          src="assets/fasttrack-company-banner.png"
-          alt="Aerial night view of FastTrack delivery routes glowing across Delhi NCR"
-          width="1920"
-          height="1080"
-        >
-        <div class="banner-shade"></div>
-        <div class="banner-particles" id="banner-particles" aria-hidden="true"></div>
-        <div class="banner-content">
-          <p class="eyebrow">FastTrack Logistics Pvt. Ltd.</p>
-          <h1>The night city, rewritten as a living route.</h1>
-          <p class="lead">India’s last-mile network with cinematic tracking, human dispatchers, and AI that chooses the quietest road — not just the shortest one.</p>
-          <div class="hero-actions">
-            <a class="btn primary" href="#dashboard">Open control room</a>
-            <button class="btn ghost" type="button" data-jump="live-map">Watch live routes</button>
-          </div>
-          <ul class="banner-meta">
-            <li>Noida HQ · Sector 62</li>
-            <li>GST 09ABCDE1234F1Z5</li>
-            <li>500+ runs a day</li>
-          </ul>
-        </div>
-        <aside class="banner-plaque glass" aria-label="Company snapshot">
-          <strong>Company banner</strong>
-          <span>Est. 2023 · Made for Indian streets</span>
-          <span>CIN U63030UP2023PTC123456</span>
-        </aside>
-        <button class="scroll-hint" type="button" data-jump="story" aria-label="Scroll to the story">
-          <span></span> Feel the city move
+  <!-- Main Application Layout -->
+  <div class="app-layout">
+    <!-- Slim Left Navigation Rail (Matching Provided Screenshot) -->
+    <aside class="left-rail" aria-label="Quick Actions">
+      <div class="rail-top">
+        <button class="rail-btn" title="Home - Operations Knowledge" data-tab="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9.5L12 3L21 9.5V20C21 20.6 20.6 21 20 21H4C3.4 21 3 20.6 3 20V9.5Z"/>
+            <path d="M9 21V12H15V21"/>
+          </svg>
         </button>
-      </article>
 
-      <article id="story" class="story-block">
-        <div class="copy reveal">
-          <p class="eyebrow">Chapter 01 · Human rhythm</p>
-          <h2>Scroll like a rider cutting through dusk traffic.</h2>
-          <p>Each section leans, breathes, and arrives a half-beat late — the way a real courier waits at a signal, then rolls. Nothing pops. Everything eases in.</p>
-        </div>
-        <div class="tilt-stage reveal" data-delay="120">
-          <div class="city-3d" id="city-3d" aria-hidden="true">
-            <div class="road"></div>
-            <div class="tower t1"></div>
-            <div class="tower t2"></div>
-            <div class="tower t3"></div>
-            <div class="tower t4"></div>
-            <div class="courier"></div>
-            <div class="headlight"></div>
+        <button class="rail-btn active" title="Dashboard - Live Control Room" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+        </button>
+
+        <button class="rail-btn" title="Maps - Spatial Hubs" data-tab="maps">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+            <line x1="8" y1="2" x2="8" y2="18"/>
+            <line x1="16" y1="6" x2="16" y2="22"/>
+          </svg>
+        </button>
+
+        <button class="rail-btn" title="Routes - AI Routing Engine" data-tab="routes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="6" cy="19" r="3"/>
+            <circle cx="18" cy="5" r="3"/>
+            <path d="M12 19h4.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H12"/>
+          </svg>
+        </button>
+
+        <button class="rail-btn" title="Fleet - Vehicle Telemetry" data-tab="fleet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </button>
+
+        <button class="rail-btn" title="Analytics - Delivery Insights" data-tab="analytics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+        </button>
+
+        <button class="rail-btn" title="Settings - System Parameters" data-tab="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="rail-bottom">
+        <button class="rail-btn" title="Help & Knowledge Guide" id="btn-rail-help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+        <button class="rail-btn" title="System Status & API Diagnostics" id="btn-rail-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content Views Stage -->
+    <div class="views-stage">
+
+      <!-- ===================================================================
+           VIEW 1: DASHBOARD (Live Map Operations Control Room)
+           =================================================================== -->
+      <div class="section-view active" id="view-dashboard">
+        <!-- Main Content Area: Map Stage + Overlays -->
+        <main class="map-viewport">
+          <!-- Full Leaflet Map Canvas -->
+          <div id="live-map-canvas" class="live-map-container"></div>
+
+          <!-- Top-Right Map Controls Toolbar -->
+          <div class="map-floating-toolbar">
+            <button class="map-tool-btn" id="tool-nav-mode" title="Navigation Mode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+              </svg>
+            </button>
+            <button class="map-tool-btn" id="tool-recenter" title="Re-center Delhi NCR (India)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"/>
+                <line x1="12" y1="1" x2="12" y2="5"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="1" y1="12" x2="5" y2="12"/>
+                <line x1="19" y1="12" x2="23" y2="12"/>
+              </svg>
+            </button>
+            <button class="map-tool-btn" id="tool-region" title="Switch Region (Delhi NCR / Mumbai / Bengaluru / India)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </button>
+            <button class="map-tool-btn" id="tool-layers" title="Toggle Map Traffic Layers">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                <polyline points="2 17 12 22 22 17"/>
+                <polyline points="2 12 12 17 22 12"/>
+              </svg>
+            </button>
+            <button class="map-tool-btn" id="tool-fullscreen" title="Toggle Fullscreen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+              </svg>
+            </button>
           </div>
-        </div>
-      </article>
 
-      <article id="live-map" class="viz-block">
-        <div class="viz-head reveal">
-          <p class="eyebrow">Chapter 02 · Live visualisation</p>
-          <h2>Three vans. One NCR. Routes that actually move.</h2>
-          <p>A schematic of tonight’s network — Connaught Place, Gurgaon, Noida — with telemetry that breathes instead of snapping.</p>
-        </div>
-        <div class="map-shell reveal" data-delay="80">
-          <canvas id="route-canvas" width="1100" height="560" aria-label="Animated route visualisation of Delhi NCR deliveries"></canvas>
-          <div class="map-legend">
-            <span class="dot saffron"></span> High priority
-            <span class="dot cyan"></span> Standard
-            <span class="dot mint"></span> Returning to hub
+          <!-- Floating Glass Card: Active Map Routes (Top-Left) -->
+          <aside class="floating-card top-left-card glass-panel" id="active-map-panel">
+            <div class="card-header-compact">
+              <h3 class="compact-title">Active: Map</h3>
+            </div>
+            <div class="routes-track-list">
+              <div class="route-track-item" data-route="FT-409">
+                <div class="track-row">
+                  <span class="track-name">Route FT-409</span>
+                  <span class="badge-status badge-active">Active</span>
+                </div>
+                <div class="track-bar bar-cyan">
+                  <div class="bar-fill" style="width: 78%;"></div>
+                </div>
+              </div>
+
+              <div class="route-track-item" data-route="FT-312">
+                <div class="track-row">
+                  <span class="track-name">Route FT-312</span>
+                  <span class="badge-status badge-active">Active</span>
+                </div>
+                <div class="track-bar bar-green">
+                  <div class="bar-fill" style="width: 62%;"></div>
+                </div>
+              </div>
+
+              <div class="route-track-item" data-route="FT-550">
+                <div class="track-row">
+                  <span class="track-name">Route FT-550</span>
+                  <span class="badge-status badge-pending">Pending</span>
+                </div>
+                <div class="track-bar bar-teal">
+                  <div class="bar-fill" style="width: 35%;"></div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Floating Glass Card: AI Route Optimization (Bottom-Left) -->
+          <aside class="floating-card bottom-left-card glass-panel" id="ai-route-optimization-panel">
+            <div class="card-header-between">
+              <h3 class="compact-title">AI Route Optimization</h3>
+              <button class="more-options-btn" title="Options">•••</button>
+            </div>
+
+            <!-- Legend and Savings badge -->
+            <div class="ai-opt-legend">
+              <div class="legend-item">
+                <span class="legend-line line-gray"></span>
+                <span class="legend-label">Traditional Routing</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-line line-cyan"></span>
+                <span class="legend-label">Bharat Express AI</span>
+              </div>
+              <div class="savings-pill">
+                <span>Optimized Savings: <strong id="savings-val">18%</strong></span>
+              </div>
+            </div>
+
+            <!-- Smooth Dual Bezier Graph Canvas -->
+            <div class="chart-container">
+              <div class="y-axis-label">Delivery Time (hrs)</div>
+              <div class="chart-canvas-wrap">
+                <canvas id="optimizationChart" width="340" height="150"></canvas>
+              </div>
+              <div class="x-axis-label">Cost ($)</div>
+            </div>
+          </aside>
+
+          <!-- Map Zoom In/Out Buttons (Bottom-Right) -->
+          <div class="map-zoom-cluster">
+            <button class="zoom-btn" id="zoom-in" title="Zoom in">+</button>
+            <button class="zoom-btn" id="zoom-out" title="Zoom out">−</button>
           </div>
-        </div>
-      </article>
 
-      <article id="algorithms" class="algo-block">
-        <p class="eyebrow reveal">Chapter 03 · Intelligence with weight</p>
-        <h2 class="reveal">Four algorithms. One quiet decision.</h2>
-        <div class="algo-grid">
-          <article class="algo-card reveal" data-delay="0">
-            <div class="algo-inner">
-              <div class="algo-face">
-                <h3>Nearest neighbour</h3>
-                <p>Small drops. Short hops. The courier’s instinct.</p>
-              </div>
-              <div class="algo-face back">Used when fewer than 4 pending stops remain.</div>
-            </div>
-          </article>
-          <article class="algo-card reveal" data-delay="80">
-            <div class="algo-inner">
-              <div class="algo-face">
-                <h3>Time window</h3>
-                <p>Rush hour. Promises kept before the sky goes orange.</p>
-              </div>
-              <div class="algo-face back">Morning and evening peaks get urgency sorting.</div>
-            </div>
-          </article>
-          <article class="algo-card reveal" data-delay="160">
-            <div class="algo-inner">
-              <div class="algo-face">
-                <h3>Cluster first</h3>
-                <p>Rain. Snow. Keep riders in one neighbourhood.</p>
-              </div>
-              <div class="algo-face back">Weather clusters Delhi, Mumbai, Bengaluru, Gurgaon.</div>
-            </div>
-          </article>
-          <article class="algo-card reveal" data-delay="240">
-            <div class="algo-inner">
-              <div class="algo-face">
-                <h3>Hybrid</h3>
-                <p>Ordinary afternoons. Mix proximity with patience.</p>
-              </div>
-              <div class="algo-face back">Default when the city is neither frantic nor flooded.</div>
-            </div>
-          </article>
-        </div>
-      </article>
-
-      <article class="stats-cinematic">
-        <div class="stats-row cinematic">
-          <article class="tilt-card reveal"><span data-count="500" data-suffix="+">0</span><label>Daily deliveries</label></article>
-          <article class="tilt-card reveal" data-delay="80"><span data-count="4.8" data-decimals="1">0</span><label>Customer rating</label></article>
-          <article class="tilt-card reveal" data-delay="160"><span data-count="30" data-suffix="%">0</span><label>Faster routes</label></article>
-          <article class="tilt-card reveal" data-delay="240"><span>₹</span><label>INR billing</label></article>
-        </div>
-      </article>
-
-      <article class="cta-strip reveal">
-        <div>
-          <h2>Step into the control room.</h2>
-          <p>Create an order, assign a rider, watch the AI pick a path.</p>
-        </div>
-        <a class="btn primary" href="#orders">Create order</a>
-      </article>
-    </section>
-
-    <section id="dashboard" class="page">
-      <h2 class="reveal">Operations Dashboard</h2>
-      <div class="kpi-grid" id="kpi-grid"></div>
-      <div class="split">
-        <div class="card tilt-card reveal">
-          <h3>AI Analysis</h3>
-          <button class="btn primary" id="btn-analyze">Run AI Analysis</button>
-          <pre id="ai-analysis" class="output"></pre>
-        </div>
-        <div class="card tilt-card reveal" data-delay="80">
-          <h3>Route Optimization</h3>
-          <button class="btn primary" id="btn-optimize">Optimize Pending Routes</button>
-          <pre id="route-output" class="output"></pre>
-        </div>
-      </div>
-      <div class="card tilt-card reveal">
-        <h3>Recent Notifications</h3>
-        <ul id="notifications" class="list"></ul>
-      </div>
-    </section>
-
-    <section id="orders" class="page">
-      <h2 class="reveal">Order Management</h2>
-      <div class="split">
-        <form id="order-form" class="card form tilt-card reveal">
-          <h3>Create Order</h3>
-          <label>Customer name<input name="customerName" required placeholder="Ananya Mehta"></label>
-          <label>Phone<input name="customerPhone" placeholder="+91-98765-43210"></label>
-          <label>Email<input name="customerEmail" type="email" placeholder="ananya@email.com"></label>
-          <label>Pickup address<input name="pickupAddress" required placeholder="Connaught Place, New Delhi"></label>
-          <label>Delivery address<input name="deliveryAddress" required placeholder="Lajpat Nagar, New Delhi"></label>
-          <label>Priority
-            <select name="priority">
-              <option value="low">Low</option>
-              <option value="medium" selected>Medium</option>
-              <option value="high">High</option>
-            </select>
-          </label>
-          <label>Order value (₹)<input name="orderValue" type="number" min="0" step="0.01" value="499"></label>
-          <fieldset class="route-choice">
-            <legend>Safety route for this booking</legend>
-            <label class="choice-card">
-              <input type="radio" name="routePreference" value="fasttrack" checked>
-              <span>
-                <strong>FastTrack own route</strong>
-                AI / dispatcher picks the fastest trusted path.
-              </span>
-            </label>
-            <label class="choice-card">
-              <input type="radio" name="routePreference" value="customer">
-              <span>
-                <strong>Customer sets own route</strong>
-                You lock via-points so the rider cannot take a shortcut.
-              </span>
-            </label>
-          </fieldset>
-          <label id="custom-route-wrap" class="custom-route-wrap" hidden>
-            Safety via-points (one per line)
-            <textarea name="customWaypoints" rows="3" placeholder="India Gate, New Delhi&#10;AIIMS Flyover, New Delhi"></textarea>
-          </label>
-          <button class="btn primary" type="submit">Create Order</button>
-          <p id="order-msg" class="msg"></p>
-        </form>
-        <div class="card tilt-card reveal" data-delay="90">
-          <h3>Track Order</h3>
-          <div class="inline">
-            <input id="track-id" type="number" min="1" placeholder="Order ID">
-            <button class="btn" id="btn-track">Track</button>
-            <button class="btn" id="btn-predict">AI Predict</button>
-            <button class="btn" id="btn-notify">Notify Customer</button>
+          <!-- Map Attribution -->
+          <div class="map-osm-attr">
+            <span>Map data © <a href="https://www.esri.com" target="_blank" rel="noopener">ESRI</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></span>
           </div>
-          <pre id="track-output" class="output"></pre>
-          <iframe id="track-map" class="track-map" title="Google Map of the booked route" hidden></iframe>
-        </div>
-      </div>
-      <div class="card reveal">
-        <div class="row-head">
-          <h3>All Orders</h3>
-          <button class="btn" id="btn-refresh-orders">Refresh</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Pickup → Delivery</th>
-                <th>Priority</th>
-                <th>Value</th>
-                <th>Status</th>
-                <th>Route</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="orders-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+        </main>
 
-    <section id="drivers" class="page">
-      <h2 class="reveal">Driver Fleet</h2>
-      <div class="split">
-        <form id="driver-form" class="card form tilt-card reveal">
-          <h3>Add Driver</h3>
-          <label>Name<input name="name" required placeholder="Rohit Verma"></label>
-          <label>Phone<input name="phone" required placeholder="+91-90000-11111"></label>
-          <label>Email<input name="email" type="email" placeholder="rohit@fasttrackdelivery.in"></label>
-          <label>Vehicle type<input name="vehicleType" required placeholder="Bike / Tempo / Van"></label>
-          <label>License plate<input name="licensePlate" placeholder="DL-1C-0001"></label>
-          <button class="btn primary" type="submit">Add Driver</button>
-          <p id="driver-msg" class="msg"></p>
-        </form>
-        <div class="card tilt-card reveal" data-delay="90">
-          <h3>Bulk Assign</h3>
-          <label>Driver ID<input id="bulk-driver" type="number" min="1"></label>
-          <label>Order IDs (comma separated)<input id="bulk-orders" placeholder="1,2"></label>
-          <button class="btn primary" id="btn-bulk">Assign</button>
-          <p id="bulk-msg" class="msg"></p>
-        </div>
-      </div>
-      <div class="card reveal">
-        <div class="row-head">
-          <h3>Drivers</h3>
-          <button class="btn" id="btn-refresh-drivers">Refresh</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Vehicle</th>
-                <th>Location</th>
-                <th>Rating</th>
-                <th>Status</th>
-                <th>Set status</th>
-              </tr>
-            </thead>
-            <tbody id="drivers-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section id="emergency" class="page">
-      <div class="emergency-head reveal">
-        <div>
-          <p class="eyebrow">Safety · Google Maps</p>
-          <h2>Emergency path to nearest police</h2>
-          <p class="lead">We use your live location, pick the closest station, and draw the latest Google driving route on the map.</p>
-        </div>
-        <div class="emergency-actions">
-          <a class="btn danger" id="dial-112" href="tel:112">Call 112</a>
-          <button class="btn primary" type="button" id="btn-refresh-police">Refresh live route</button>
-        </div>
-      </div>
-      <p id="emergency-status" class="msg" role="status">Preparing Google Map…</p>
-      <div class="emergency-layout">
-        <div class="map-frame">
-          <iframe
-            id="police-map"
-            title="Google Map route to nearest police station"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <aside class="emergency-panel">
-          <article class="card nearest-card">
-            <p class="eyebrow">Nearest station</p>
-            <h3 id="nearest-name">Locating…</h3>
-            <p id="nearest-address"></p>
-            <p id="nearest-meta" class="muted"></p>
-            <div class="inline">
-              <a class="btn primary" id="open-gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener">Open in Google Maps</a>
-              <a class="btn" id="nearest-phone" href="tel:100">Call station</a>
+        <!-- Right Sidebar Dashboard Panels -->
+        <aside class="right-panel">
+          <!-- 1. Telemetry Stats (Real-Time) -->
+          <section class="glass-card telemetry-card">
+            <div class="card-head-row">
+              <h3 class="card-heading">Telemetry Stats (Real-Time)</h3>
+              <button class="card-dots-btn">•••</button>
             </div>
-          </article>
-          <article class="card">
-            <h3>Other nearby stations</h3>
-            <p class="muted">Tap a station to redraw the Google path.</p>
-            <div id="station-list" class="station-list"></div>
-          </article>
-          <article class="card form">
-            <h3>Log SOS to control room</h3>
-            <label>Linked order ID (optional)<input id="sos-order-id" type="number" min="1" placeholder="e.g. 1"></label>
-            <button class="btn danger" type="button" id="btn-sos-log">Send SOS + keep map route</button>
-          </article>
+
+            <div class="telemetry-grid">
+              <!-- Metric 1: Active Vans -->
+              <div class="telem-item">
+                <div class="telem-label">Active Vans</div>
+                <div class="telem-value" id="val-active-vans">48/50</div>
+                <div class="sparkline-wrap">
+                  <canvas id="sparkActiveVans" width="140" height="34"></canvas>
+                </div>
+              </div>
+
+              <!-- Metric 2: Avg Speed -->
+              <div class="telem-item">
+                <div class="telem-label">Avg Speed</div>
+                <div class="telem-value" id="val-avg-speed">34 mph</div>
+                <div class="gauge-wrap">
+                  <canvas id="gaugeSpeed" width="110" height="60"></canvas>
+                </div>
+              </div>
+
+              <!-- Metric 3: On-Time Rate -->
+              <div class="telem-item">
+                <div class="telem-label">On-Time Rate</div>
+                <div class="telem-value" id="val-ontime">96%</div>
+                <div class="sparkline-wrap">
+                  <canvas id="sparkOnTime" width="140" height="34"></canvas>
+                </div>
+              </div>
+
+              <!-- Metric 4: Fuel Efficiency -->
+              <div class="telem-item">
+                <div class="telem-label">Fuel Efficiency</div>
+                <div class="telem-value" id="val-fuel">18 MPG</div>
+                <div class="gauge-wrap">
+                  <canvas id="gaugeFuel" width="110" height="60"></canvas>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. Delivery Status Overview -->
+          <section class="glass-card delivery-status-card">
+            <div class="card-head-row">
+              <h3 class="card-heading">Delivery Status Overview</h3>
+              <button class="card-dots-btn">•••</button>
+            </div>
+
+            <div class="orders-subhead">
+              <span class="total-orders-text">Total Orders: <strong id="total-orders-count">1,280</strong></span>
+            </div>
+
+            <div class="donut-section-row">
+              <div class="donut-wrap">
+                <canvas id="donutChart" width="130" height="130"></canvas>
+              </div>
+
+              <div class="donut-legend-col">
+                <div class="legend-header-line">Total Orders</div>
+                <div class="status-legend-item">
+                  <span class="status-bullet bullet-green"></span>
+                  <span class="status-legend-label">Completed: <strong>914 (71%)</strong></span>
+                </div>
+                <div class="status-legend-item">
+                  <span class="status-bullet bullet-cyan"></span>
+                  <span class="status-legend-label">In Transit: <strong>245</strong></span>
+                </div>
+                <div class="status-legend-item">
+                  <span class="status-bullet bullet-coral"></span>
+                  <span class="status-legend-label">Delayed: <strong>121 (9.5%)</strong></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. Driver Assignment Panel -->
+          <section class="glass-card driver-panel-card">
+            <div class="card-head-row">
+              <h3 class="card-heading">Driver Assignment Panel</h3>
+              <button class="btn-text-action" id="btn-open-assign-top">Assign New Driver</button>
+            </div>
+
+            <div class="drivers-table-wrapper">
+              <table class="drivers-table">
+                <thead>
+                  <tr>
+                    <th>Active Driver</th>
+                    <th>Van</th>
+                    <th>Route</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="driver-rows-body">
+                  <tr class="driver-row" data-driver-id="04" data-route="FT-409">
+                    <td class="driver-cell">
+                      <span class="driver-idx">1</span>
+                      <div class="driver-meta">
+                        <span class="d-name">Amit Singh</span>
+                        <span class="d-sub">ID: 01 · DL-8C</span>
+                      </div>
+                    </td>
+                    <td class="van-cell">A12</td>
+                    <td class="route-cell">FT-409</td>
+                    <td class="status-cell"><span class="badge-status badge-on-route">On Route</span></td>
+                  </tr>
+
+                  <tr class="driver-row" data-driver-id="08" data-route="FT-312">
+                    <td class="driver-cell">
+                      <span class="driver-idx">2</span>
+                      <div class="driver-meta">
+                        <span class="d-name">Sunita Devi</span>
+                        <span class="d-sub">ID: 02 · DL-9S</span>
+                      </div>
+                    </td>
+                    <td class="van-cell">C09</td>
+                    <td class="route-cell">FT-312</td>
+                    <td class="status-cell"><span class="badge-status badge-on-route">On Route</span></td>
+                  </tr>
+
+                  <tr class="driver-row" data-driver-id="15" data-route="FT-550">
+                    <td class="driver-cell">
+                      <span class="driver-idx">3</span>
+                      <div class="driver-meta">
+                        <span class="d-name">Rajesh Sharma</span>
+                        <span class="d-sub">ID: 03 · UP-16</span>
+                      </div>
+                    </td>
+                    <td class="van-cell">D21</td>
+                    <td class="route-cell">FT-550</td>
+                    <td class="status-cell"><span class="badge-status badge-loading">Loading</span></td>
+                  </tr>
+
+                  <tr class="driver-row" data-driver-id="02" data-route="FT-401">
+                    <td class="driver-cell">
+                      <span class="driver-idx">4</span>
+                      <div class="driver-meta">
+                        <span class="d-name">Vikram Patel</span>
+                        <span class="d-sub">ID: 04 · HR-26</span>
+                      </div>
+                    </td>
+                    <td class="van-cell">B03</td>
+                    <td class="route-cell">FT-401</td>
+                    <td class="status-cell"><span class="badge-status badge-delayed">Delayed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Driver Assignment Action Buttons -->
+            <div class="driver-actions-row">
+              <button class="btn-subtle" id="btn-assign-modal">Assign New Driver</button>
+              <button class="btn-subtle" id="btn-live-chat">Live Chat</button>
+              <button class="btn-optimize-glow" id="btn-optimize-now">Optimize Now</button>
+            </div>
+          </section>
         </aside>
       </div>
-    </section>
 
-    <section id="about" class="page">
-      <h2 class="reveal">About FastTrack Logistics</h2>
-      <div class="card prose tilt-card reveal">
-        <p>FastTrack Logistics Pvt. Ltd. is an AI-powered delivery platform built for Indian last-mile operations. The system combines nearest-neighbor, time-window, cluster-first, and hybrid routing algorithms.</p>
-        <ul>
-          <li><strong>Address:</strong> A-15, Sector 62, Noida, Uttar Pradesh - 201301</li>
-          <li><strong>Phone:</strong> +91-120-4567890</li>
-          <li><strong>Email:</strong> info@fasttrackdelivery.in</li>
-          <li><strong>CIN:</strong> U63030UP2023PTC123456</li>
-          <li><strong>GST:</strong> 09ABCDE1234F1Z5</li>
+      <!-- ===================================================================
+           VIEW 2: HOME (Operations Knowledge & Network Overview)
+           =================================================================== -->
+      <div class="section-view" id="view-home">
+        <div class="content-scroll-container">
+          <!-- Hero Header -->
+          <div class="view-hero-banner">
+            <div class="hero-badge">⚡ National Logistics Mesh</div>
+            <h1 class="hero-title">Bharat Express: India's Autonomous Last-Mile Logistics Infrastructure</h1>
+            <p class="hero-subtitle">Engineering high-throughput delivery operations across Delhi NCR, Mumbai, and Bengaluru with sub-30 minute precision, predictive traffic intelligence, and customer safety locks.</p>
+            
+            <div class="hero-kpi-row">
+              <div class="hero-kpi-card">
+                <span class="kpi-num">1,280+</span>
+                <span class="kpi-txt">Deliveries Handled Daily</span>
+              </div>
+              <div class="hero-kpi-card">
+                <span class="kpi-num">48 / 50</span>
+                <span class="kpi-txt">Active Fleet in Circulation</span>
+              </div>
+              <div class="hero-kpi-card">
+                <span class="kpi-num">24.8%</span>
+                <span class="kpi-txt">Average AI Fuel Savings</span>
+              </div>
+              <div class="hero-kpi-card">
+                <span class="kpi-num">98.5%</span>
+                <span class="kpi-txt">On-Time SLA Guarantee</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Knowledge Section: 4 Core Pillars -->
+          <div class="knowledge-block">
+            <div class="section-heading-wrap">
+              <h2 class="section-main-title">💡 User Knowledge Center: Core Operational Pillars</h2>
+              <p class="section-sub-title">Everything you need to understand about how Bharat Express orchestrates last-mile runs.</p>
+            </div>
+
+            <div class="pillars-grid">
+              <div class="pillar-card">
+                <div class="pillar-icon">🛣️</div>
+                <h3>1. Dynamic Urban Road Sense</h3>
+                <p>Unlike standard GPS apps that only follow distance, Bharat Express continuously monitors flyover choke points, ongoing road construction, and vehicle-type clearances (e.g. narrow alleys restricted for Tempo trucks, ideal for EV Scooties).</p>
+                <div class="pillar-tag">Active in NCR, Mumbai & Bengaluru</div>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon">🔒</div>
+                <h3>2. Customer Safety Route Lock</h3>
+                <p>Safety is non-negotiable. When booking an order, customers or dispatchers can lock key safety waypoints (e.g., India Gate, AIIMS Flyover, NH-48). The AI engine will <strong>never</strong> divert the courier into unverified shortcuts.</p>
+                <div class="pillar-tag">Zero Shortcut Violation Guarantee</div>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon">🧩</div>
+                <h3>3. Predictive Micro-Clustering</h3>
+                <p>Incoming orders within a 3-kilometer radius are clustered before rider dispatch using spatial K-Means heuristics. This prevents multiple drivers from visiting the same sector, reducing idle transit time by up to 34%.</p>
+                <div class="pillar-tag">Clustering Engine v3.4</div>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon">🚨</div>
+                <h3>4. Instant SOS Police Mesh</h3>
+                <p>In case of emergencies, accidents, or transit delays, our integrated police locator uses real-time telemetry to route couriers to the nearest verified station (112 Emergency protocol) with one click.</p>
+                <div class="pillar-tag">Direct 112 / 100 Sync</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Navigation CTA -->
+          <div class="quick-cta-strip">
+            <div>
+              <h3>Ready to supervise real-time deliveries?</h3>
+              <p>Switch to the live control room map to monitor delivery vans in motion.</p>
+            </div>
+            <button class="btn-optimize-glow" data-jump="dashboard">Open Live Dashboard</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           VIEW 3: MAPS (Spatial Hubs & Geofence Intelligence)
+           =================================================================== -->
+      <div class="section-view" id="view-maps">
+        <div class="content-scroll-container">
+          <div class="view-header-strip">
+            <div>
+              <h2>🗺️ Spatial Hubs & Geofencing Intelligence</h2>
+              <p>Explore logistics hubs across India, active delivery geofences, and spatial speed restrictions.</p>
+            </div>
+            <div class="header-action-group">
+              <button class="btn-subtle" id="btn-recenter-maps-view">Center Delhi NCR</button>
+            </div>
+          </div>
+
+          <!-- Hub Cards Grid -->
+          <div class="hubs-grid">
+            <div class="hub-status-card active-hub">
+              <div class="hub-header">
+                <span class="hub-badge badge-active">Active Primary Hub</span>
+                <span class="hub-code">DEL-01</span>
+              </div>
+              <h3>Delhi NCR Central Corridor</h3>
+              <p class="hub-location">Sector 62 Noida HQ · Connaught Place · DLF Cyber City</p>
+              <div class="hub-metrics-row">
+                <div><strong>48</strong><span>Active Vans</span></div>
+                <div><strong>98.5%</strong><span>On-Time SLA</span></div>
+                <div><strong>34 km/h</strong><span>Avg Speed</span></div>
+              </div>
+            </div>
+
+            <div class="hub-status-card">
+              <div class="hub-header">
+                <span class="hub-badge badge-active">Active Regional Hub</span>
+                <span class="hub-code">BOM-02</span>
+              </div>
+              <h3>Mumbai West Coastal Corridor</h3>
+              <p class="hub-location">Bandra Kurla Complex (BKC) · Andheri East · Navi Mumbai</p>
+              <div class="hub-metrics-row">
+                <div><strong>36</strong><span>Active Vans</span></div>
+                <div><strong>97.2%</strong><span>On-Time SLA</span></div>
+                <div><strong>28 km/h</strong><span>Avg Speed</span></div>
+              </div>
+            </div>
+
+            <div class="hub-status-card">
+              <div class="hub-header">
+                <span class="hub-badge badge-active">Active Tech Hub</span>
+                <span class="hub-code">BLR-03</span>
+              </div>
+              <h3>Bengaluru Tech Corridor</h3>
+              <p class="hub-location">Electronic City · Whitefield · Outer Ring Road</p>
+              <div class="hub-metrics-row">
+                <div><strong>42</strong><span>Active Vans</span></div>
+                <div><strong>99.1%</strong><span>On-Time SLA</span></div>
+                <div><strong>26 km/h</strong><span>Avg Speed</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Knowledge Card for Maps -->
+          <div class="guide-card">
+            <h3>💡 Knowledge Guide: Spatial Geofencing & Telemetry Tracking</h3>
+            <p>Every delivery run in Bharat Express is bounded by dynamic polygon geofences:</p>
+            <ul class="guide-bullets">
+              <li><strong>Speed Governors:</strong> In congested pedestrian zones (such as Connaught Place Inner Circle or Chandni Chowk), dispatch monitors a 40 km/h ceiling to prevent pedestrian accidents.</li>
+              <li><strong>Stationary Alert:</strong> If a van marker remains stationary outside a delivery address for more than 8 minutes, the system raises an amber flag in the Dispatch Radio drawer.</li>
+              <li><strong>Arrival Proximity:</strong> When a driver passes within 500 meters of the destination waypoint, the customer automatically receives an SMS with live OTP delivery verification.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           VIEW 4: ROUTES (AI Route Optimization Knowledge)
+           =================================================================== -->
+      <div class="section-view" id="view-routes">
+        <div class="content-scroll-container">
+          <div class="view-header-strip">
+            <div>
+              <h2>🧭 Intelligent Routing Engines & Algorithms</h2>
+              <p>Understand the four machine learning algorithms powering Bharat Express route optimization.</p>
+            </div>
+            <button class="btn-optimize-glow" id="btn-run-algo-test">Simulate AI Rerouting</button>
+          </div>
+
+          <!-- 4 Algorithms Comparison Grid -->
+          <div class="algo-knowledge-grid">
+            <div class="algo-detail-card">
+              <div class="algo-tag">Algorithm 01</div>
+              <h3>Nearest Neighbour Heuristic</h3>
+              <p class="algo-summary">Calculates the greedy shortest path by picking the closest unvisited stop.</p>
+              <div class="algo-meta-block">
+                <div><strong>When Used:</strong> When fewer than 4 pending stops remain in a compact sector.</div>
+                <div><strong>Computation Time:</strong> &lt; 5 milliseconds</div>
+                <div><strong>Advantage:</strong> Instantaneous dispatch for local neighborhood drops.</div>
+              </div>
+            </div>
+
+            <div class="algo-detail-card">
+              <div class="algo-tag">Algorithm 02</div>
+              <h3>Time Window Priority (Urgency)</h3>
+              <p class="algo-summary">Sorts stops based on strict SLA deadlines, prioritizing deliveries approaching promise times.</p>
+              <div class="algo-meta-block">
+                <div><strong>When Used:</strong> Rush hours (10:00–12:00 and 18:00–20:00) and express perishables.</div>
+                <div><strong>Computation Time:</strong> &lt; 15 milliseconds</div>
+                <div><strong>Advantage:</strong> Eliminates late deliveries and customer SLA penalties.</div>
+              </div>
+            </div>
+
+            <div class="algo-detail-card">
+              <div class="algo-tag">Algorithm 03</div>
+              <h3>Weather &amp; Hazard Clustering</h3>
+              <p class="algo-summary">Clusters couriers within high-density micro-zones to minimize travel during adverse conditions.</p>
+              <div class="algo-meta-block">
+                <div><strong>When Used:</strong> Heavy rain, localized flooding (Minto Bridge / Dhaula Kuan), or severe smog.</div>
+                <div><strong>Computation Time:</strong> &lt; 25 milliseconds</div>
+                <div><strong>Advantage:</strong> Keeps couriers safe by avoiding hazardous highway stretches.</div>
+              </div>
+            </div>
+
+            <div class="algo-detail-card highlight-algo">
+              <div class="algo-tag">Algorithm 04 · Default Engine</div>
+              <h3>Hybrid Adaptive Optimizer</h3>
+              <p class="algo-summary">Blends spatial proximity, historical traffic graphs, and live driver ratings into a unified cost score.</p>
+              <div class="algo-meta-block">
+                <div><strong>When Used:</strong> Standard daily operations across Delhi NCR and Indian corridors.</div>
+                <div><strong>Computation Time:</strong> &lt; 35 milliseconds</div>
+                <div><strong>Advantage:</strong> Delivers 24.8% fuel savings while honoring all delivery time promises.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guide Card -->
+          <div class="guide-card">
+            <h3>💡 Knowledge Guide: FastTrack Routing vs Customer Locked Paths</h3>
+            <p>During checkout, if a user chooses <strong>"Customer sets own route"</strong>, they can lock specific via-points (e.g. Ring Road via India Gate). When dispatch runs:</p>
+            <ul class="guide-bullets">
+              <li>Locked routes are strictly isolated from AI alterations. The driver's navigation device forces compliance with customer-specified waypoints.</li>
+              <li>Unlocked orders are automatically rearranged by the <strong>Hybrid Adaptive Optimizer</strong> to maximize van fuel efficiency.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           VIEW 5: FLEET (Vehicle Telemetry & Allocation)
+           =================================================================== -->
+      <div class="section-view" id="view-fleet">
+        <div class="content-scroll-container">
+          <div class="view-header-strip">
+            <div>
+              <h2>🚚 Fleet Telemetry & Vehicle Intelligence</h2>
+              <p>Monitor the health, fuel/battery reserves, and assignment status of all 50 last-mile vehicles.</p>
+            </div>
+            <button class="btn-subtle" id="btn-refresh-fleet-view">Sync Live Telemetry</button>
+          </div>
+
+          <!-- Fleet Health Cards -->
+          <div class="fleet-stats-row">
+            <div class="fleet-kpi">
+              <span class="fleet-val">22</span>
+              <span class="fleet-lbl">Electric 2-Wheelers (Avg 86% Battery)</span>
+            </div>
+            <div class="fleet-kpi">
+              <span class="fleet-val">16</span>
+              <span class="fleet-lbl">CNG 3-Wheelers / Tempos (Avg 74% Fuel)</span>
+            </div>
+            <div class="fleet-kpi">
+              <span class="fleet-val">12</span>
+              <span class="fleet-lbl">Electric Delivery Vans (Avg 91% Battery)</span>
+            </div>
+            <div class="fleet-kpi">
+              <span class="fleet-val">100%</span>
+              <span class="fleet-lbl">Fleet Inspection Compliance</span>
+            </div>
+          </div>
+
+          <!-- Detailed Fleet Roster Table -->
+          <div class="glass-card table-section">
+            <h3 class="card-heading" style="margin-bottom: 12px;">Active Vehicle Roster &amp; Health Telemetry</h3>
+            <div class="drivers-table-wrapper">
+              <table class="drivers-table">
+                <thead>
+                  <tr>
+                    <th>Vehicle Code</th>
+                    <th>Plate Number</th>
+                    <th>Vehicle Type</th>
+                    <th>Assigned Driver</th>
+                    <th>Energy Reserve</th>
+                    <th>Route Assignment</th>
+                    <th>Maintenance Health</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Van A12</strong></td>
+                    <td class="van-cell">DL-8C-1234</td>
+                    <td>CNG Cargo Tempo</td>
+                    <td>Amit Singh</td>
+                    <td><span style="color: #22c55e;">78% Fuel</span></td>
+                    <td class="route-cell">FT-409 (Active)</td>
+                    <td><span class="badge-status badge-active">Optimal · 98%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Van C09</strong></td>
+                    <td class="van-cell">DL-9S-5678</td>
+                    <td>Electric Scooty</td>
+                    <td>Sunita Devi</td>
+                    <td><span style="color: #00e5ff;">91% Battery</span></td>
+                    <td class="route-cell">FT-312 (Active)</td>
+                    <td><span class="badge-status badge-active">Optimal · 100%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Van D21</strong></td>
+                    <td class="van-cell">UP-16-9021</td>
+                    <td>Electric Delivery Van</td>
+                    <td>Rajesh Sharma</td>
+                    <td><span style="color: #00e5ff;">84% Battery</span></td>
+                    <td class="route-cell">FT-550 (Loading)</td>
+                    <td><span class="badge-status badge-active">Optimal · 96%</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Van B03</strong></td>
+                    <td class="van-cell">HR-26-8891</td>
+                    <td>Delivery Van</td>
+                    <td>Vikram Patel</td>
+                    <td><span style="color: #fb923c;">62% Fuel</span></td>
+                    <td class="route-cell">FT-401 (Delayed)</td>
+                    <td><span class="badge-status badge-delayed">Service in 420 km</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Guide Card -->
+          <div class="guide-card">
+            <h3>💡 Knowledge Guide: Predictive Fleet Telemetry &amp; EV Optimization</h3>
+            <p>Bharat Express vehicles stream CAN-bus telemetry back to the central dispatcher every 1,500 milliseconds:</p>
+            <ul class="guide-bullets">
+              <li><strong>Battery State of Health (SOH):</strong> Our algorithm automatically assigns EV scooties to flat urban zones (Connaught Place) and routes CNG Tempos to longer suburban highway runs (Gurgaon).</li>
+              <li><strong>Regenerative Braking Metrics:</strong> Riders with smooth braking habits are rewarded with monthly efficiency bonuses, lowering maintenance costs by 18%.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           VIEW 6: ANALYTICS (Deep Operational Metrics)
+           =================================================================== -->
+      <div class="section-view" id="view-analytics">
+        <div class="content-scroll-container">
+          <div class="view-header-strip">
+            <div>
+              <h2>📊 Performance Analytics &amp; Delivery Intelligence</h2>
+              <p>Review comprehensive logistics telemetry, financial volume, and environmental impact.</p>
+            </div>
+          </div>
+
+          <div class="analytics-stat-grid">
+            <div class="analytics-card">
+              <h4>Total Orders Processed</h4>
+              <div class="analytics-metric">1,280</div>
+              <p class="analytics-sub">+18% growth week-on-week across NCR</p>
+            </div>
+            <div class="analytics-card">
+              <h4>On-Time SLA Rating</h4>
+              <div class="analytics-metric" style="color: #22c55e;">98.5%</div>
+              <p class="analytics-sub">Industry standard: 92.0%</p>
+            </div>
+            <div class="analytics-card">
+              <h4>Total Fleet Revenue</h4>
+              <div class="analytics-metric" style="color: #ff9933;">₹4,82,900</div>
+              <p class="analytics-sub">INR Billing across 1,280 completed drops</p>
+            </div>
+            <div class="analytics-card">
+              <h4>Carbon Emissions Avoided</h4>
+              <div class="analytics-metric" style="color: #00e5ff;">1,420 kg CO₂</div>
+              <p class="analytics-sub">Via EV routing and AI trip consolidation</p>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <h3>💡 Knowledge Guide: Decoding Logistics KPIs</h3>
+            <p><strong>On-Time Delivery Rate:</strong> Calculated as the percentage of packages scanned at the customer doorstep within ±5 minutes of the promised SLA window.</p>
+            <p><strong>Fuel Efficiency Score:</strong> Evaluated by comparing actual fuel/kWh consumed against the baseline traditional routing without AI clustering.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           VIEW 7: SETTINGS (System Configuration & Parameters)
+           =================================================================== -->
+      <div class="section-view" id="view-settings">
+        <div class="content-scroll-container">
+          <div class="view-header-strip">
+            <div>
+              <h2>⚙️ System Configuration &amp; Parameters</h2>
+              <p>Adjust dispatch automation parameters, alert speeds, and regional preferences.</p>
+            </div>
+            <button class="btn-optimize-glow" id="btn-save-settings">Save Settings</button>
+          </div>
+
+          <div class="settings-sections-grid">
+            <!-- Settings Card 1: Dispatch Controls -->
+            <div class="glass-card settings-card">
+              <h3 class="card-heading">Dispatch Automation Controls</h3>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <strong>Automatic Route Optimization</strong>
+                  <span>Automatically recalculate routes when traffic density spikes > 30%</span>
+                </div>
+                <input type="checkbox" checked class="setting-toggle">
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <strong>Max Orders Per Delivery Van</strong>
+                  <span>Limit number of drop-offs assigned to single courier run</span>
+                </div>
+                <input type="number" value="6" min="1" max="15" class="setting-input-small">
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <strong>Minimum Driver Rating for High-Priority Orders</strong>
+                  <span>Only drivers with this rating will receive high-value consignments</span>
+                </div>
+                <input type="number" value="4.8" step="0.1" min="4.0" max="5.0" class="setting-input-small">
+              </div>
+            </div>
+
+            <!-- Settings Card 2: Safety & Compliance -->
+            <div class="glass-card settings-card">
+              <h3 class="card-heading">Safety &amp; Compliance Standards</h3>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <strong>Speed Governor Alert</strong>
+                  <span>Trigger audible beep in courier device when exceeding threshold</span>
+                </div>
+                <input type="number" value="65" min="30" max="90" class="setting-input-small"> km/h
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <strong>Emergency Police Auto-Triangulation</strong>
+                  <span>Automatically cache nearest police station along every assigned route</span>
+                </div>
+                <input type="checkbox" checked class="setting-toggle">
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <strong>Customer Safe-Route Priority</strong>
+                  <span>Always honor customer safety via-points over shortest algorithmic path</span>
+                </div>
+                <input type="checkbox" checked class="setting-toggle">
+              </div>
+            </div>
+          </div>
+
+          <!-- Guide Card -->
+          <div class="guide-card">
+            <h3>💡 Knowledge Guide: Setting Operational Parameters</h3>
+            <p>Adjusting these settings directly updates the Express backend routing engine at runtime. When testing in high-traffic conditions, lowering the <em>Max Orders Per Delivery Van</em> reduces average transit time by 12%.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Interactive Assign Driver Modal -->
+  <div class="modal-backdrop" id="assignModal" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Assign Driver to Route</h3>
+        <button class="modal-close-btn" id="closeAssignModal">&times;</button>
+      </div>
+      <form id="assignDriverForm">
+        <div class="form-group">
+          <label for="assignDriverSelect">Select Driver</label>
+          <select id="assignDriverSelect" required>
+            <option value="Amit Singh (ID: 01)">Amit Singh (ID: 01) - Tempo DL-8C</option>
+            <option value="Sunita Devi (ID: 02)">Sunita Devi (ID: 02) - Scooty DL-9S</option>
+            <option value="Rajesh Sharma (ID: 03)">Rajesh Sharma (ID: 03) - Van DL-1C</option>
+            <option value="Vikram Patel (ID: 04)">Vikram Patel (ID: 04) - Electric Van HR-26</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="assignVanInput">Vehicle / Plate Number</label>
+          <input id="assignVanInput" type="text" value="DL-8C-1234" placeholder="e.g. DL-8C-1234" required>
+        </div>
+        <div class="form-group">
+          <label for="assignRouteSelect">Route Assignment (Delhi NCR)</label>
+          <select id="assignRouteSelect">
+            <option value="FT-409">Route FT-409 (Connaught Place → Lajpat Nagar)</option>
+            <option value="FT-312">Route FT-312 (Karol Bagh → Gurgaon Cyber City)</option>
+            <option value="FT-550">Route FT-550 (Mayur Vihar → Noida Sector 62)</option>
+            <option value="FT-401">Route FT-401 (AIIMS → Okhla Phase 3)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-subtle" id="cancelAssignBtn">Cancel</button>
+          <button type="submit" class="btn-optimize-glow">Confirm Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Live Chat Drawer -->
+  <div class="chat-drawer" id="chatDrawer" hidden>
+    <div class="chat-header">
+      <div class="chat-title-group">
+        <div class="live-dot"></div>
+        <h4>Dispatch Live Operations Radio</h4>
+      </div>
+      <button class="modal-close-btn" id="closeChatBtn">&times;</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg system">
+        <span>Connected to FastTrack Delhi NCR Last-Mile Mesh Network. All vans transmitting.</span>
+      </div>
+      <div class="chat-msg driver">
+        <div class="chat-author">Amit Singh (Van A12) · 10:41 AM</div>
+        <div class="chat-bubble">Route FT-409: Arrived at Connaught Place hub. Rajesh Kumar order #1 picked up.</div>
+      </div>
+      <div class="chat-msg driver">
+        <div class="chat-author">Sunita Devi (Van C09) · 10:43 AM</div>
+        <div class="chat-bubble">Route FT-312: Dhaula Kuan flyover clear. En route to DLF Cyber City.</div>
+      </div>
+      <div class="chat-msg dispatcher">
+        <div class="chat-author">Alex Chen (Dispatcher) · 10:44 AM</div>
+        <div class="chat-bubble">Copy that Sunita. Weather cluster routing active for NCR. Drive safe.</div>
+      </div>
+    </div>
+    <form class="chat-input-row" id="chatForm">
+      <input type="text" id="chatInput" placeholder="Send dispatch broadcast to fleet..." required autocomplete="off">
+      <button type="submit" class="btn-optimize-glow">Send</button>
+    </form>
+  </div>
+
+  <!-- Interactive Knowledge Base Drawer -->
+  <div class="knowledge-drawer" id="knowledgeDrawer" hidden>
+    <div class="knowledge-header">
+      <div class="chat-title-group">
+        <span style="font-size: 1.2rem;">💡</span>
+        <h4>User Knowledge &amp; Operations Manual</h4>
+      </div>
+      <button class="modal-close-btn" id="closeKnowledgeBtn">&times;</button>
+    </div>
+    <div class="knowledge-body">
+      <div class="kb-section">
+        <h4>Overview of Bharat Express</h4>
+        <p>Bharat Express is an autonomous logistics intelligence platform built specifically for Indian urban street networks. It combines nearest-neighbour proximity with real-time congestion forecasting and rider safety constraints.</p>
+      </div>
+
+      <div class="kb-section">
+        <h4>Section Guide for Operators:</h4>
+        <ul class="kb-list">
+          <li><strong>Home:</strong> Complete system overview, company mission, and active national logistics hubs.</li>
+          <li><strong>Dashboard:</strong> Live operations control center with real-time map, animated delivery vans, telemetry gauges, and quick dispatch buttons.</li>
+          <li><strong>Maps:</strong> Spatial intelligence across Delhi NCR, Mumbai, and Bengaluru corridors with geofence speed controls.</li>
+          <li><strong>Routes:</strong> Detailed breakdown of the 4 AI routing algorithms (Nearest Neighbour, Time Window, Weather Cluster, Hybrid).</li>
+          <li><strong>Fleet:</strong> Complete health telemetry for all 50 vehicles, EV battery levels, maintenance countdowns, and driver assignments.</li>
+          <li><strong>Settings:</strong> Automation parameters, speed limits, and threshold configs.</li>
         </ul>
       </div>
-    </section>
 
-    <section id="help" class="page">
-      <h2 class="reveal">Help &amp; Support</h2>
-      <div class="card prose tilt-card reveal">
-        <ol>
-          <li>On booking, choose <strong>FastTrack own route</strong> or <strong>Customer sets own route</strong> (via-points for safety). On dispatch, pick which of those two paths the rider must follow.</li>
-          <li>Open Dashboard and run AI analysis or route optimization.</li>
-          <li>Track an order by ID, or tap SOS to open Emergency — Google Maps shows the latest path to the nearest police station.</li>
-          <li>Add drivers and bulk-assign pending orders from the Drivers page.</li>
-        </ol>
+      <div class="kb-section">
+        <h4>Keyboard &amp; Quick Navigation Shortcuts</h4>
+        <p>You can click on any route item or driver in the tables to instantly zoom and track that vehicle on the map. Click <strong>"Optimize Now"</strong> anytime to run AI recalculation.</p>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <section id="contact" class="page">
-      <h2 class="reveal">Contact</h2>
-      <div class="card prose tilt-card reveal">
-        <p>Support: support@fasttrackdelivery.in</p>
-        <p>Phone: +91-120-4567890</p>
-        <p>Hours: Mon–Sat, 9:00 AM – 7:00 PM IST</p>
+  <!-- System Info Diagnostics Modal -->
+  <div class="modal-backdrop" id="infoModal" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>System Diagnostics &amp; API Status</h3>
+        <button class="modal-close-btn" id="closeInfoModal">&times;</button>
       </div>
-    </section>
-  </main>
+      <div class="info-content-list">
+        <div class="info-row">
+          <span>Backend Server:</span>
+          <strong style="color: #22c55e;">Express API Active (Port 3005)</strong>
+        </div>
+        <div class="info-row">
+          <span>Map Provider:</span>
+          <strong style="color: #00e5ff;">ESRI World Dark Canvas (No Watermark)</strong>
+        </div>
+        <div class="info-row">
+          <span>AI Routing Engine:</span>
+          <strong style="color: #22c55e;">Hybrid Adaptive v2.4 (Active)</strong>
+        </div>
+        <div class="info-row">
+          <span>Emergency Mesh:</span>
+          <strong style="color: #22c55e;">Delhi NCR Police Directory + 112 Protocol</strong>
+        </div>
+        <div class="info-row">
+          <span>Active Fleet Connection:</span>
+          <strong style="color: #22c55e;">48 Vehicles Transmitting at 1.5s Intervals</strong>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-optimize-glow" id="closeInfoModalBtn">Done</button>
+      </div>
+    </div>
+  </div>
 
-  <footer class="site-footer">
-    <span>FastTrack Logistics Pvt. Ltd. · Made in India</span>
-    <p id="server-note" class="server-note" hidden>
-      The local server is not running. Open a terminal in this project, run <code>npm start</code>, then visit
-      <a href="http://localhost:3000">http://localhost:3000</a> (do not open index.html from the folder).
-    </p>
-  </footer>
-  <script src="motion.js"></script>
+  <!-- Notification Toast for AI Optimizer -->
+  <div class="notification-toast" id="optToast" hidden>
+    <div class="toast-icon">⚡</div>
+    <div class="toast-content">
+      <h4 id="toastTitle">Bharat Express AI Routing Engine</h4>
+      <p id="toastMessage">Recalculating multi-stop routes across Delhi NCR hubs...</p>
+    </div>
+  </div>
+
+  <!-- Leaflet Map Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="script.js"></script>
-  <script src="emergency.js"></script>
 </body>
 </html>
