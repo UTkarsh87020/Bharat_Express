@@ -43,8 +43,9 @@
 7. [Hardware Telemetry Gauges & Canvas Visualizations](#-hardware-telemetry-gauges--canvas-visualizations)
 8. [REST API Documentation & Payload Reference](#-rest-api-documentation)
 9. [Quick Start & Installation](#-quick-start--installation)
-10. [Keyboard Shortcuts & Dispatch Ergonomics](#-keyboard-shortcuts--dispatch-ergonomics)
-11. [Project Directory Structure](#-project-directory-structure)
+10. [Cloud Deployment & Production Architecture (Render)](#-cloud-deployment--production-architecture)
+11. [Keyboard Shortcuts & Dispatch Ergonomics](#-keyboard-shortcuts--dispatch-ergonomics)
+12. [Project Directory Structure](#-project-directory-structure)
 
 ---
 
@@ -469,6 +470,32 @@ http://localhost:3005
 
 > [!NOTE]
 > If port `3005` is in use by another application, the server automatically attempts port fallback (e.g. `3006`, `3007`) and logs the active URL in the console.
+
+---
+
+## ☁️ Cloud Deployment & Production Architecture
+
+Bharat Express is hosted and deployed as an autonomous, high-availability web service on **Render**:
+
+| Attribute | Production Configuration |
+| :--- | :--- |
+| **Live URL** | [https://bharat-express.onrender.com/](https://bharat-express.onrender.com/) |
+| **Platform** | [Render Cloud](https://render.com) (PaaS) |
+| **Service Name** | `bharat-express` |
+| **Service Type** | Web Service (Node.js 18+ runtime) |
+| **Repository** | [UTkarsh87020/Bharat_Express](https://github.com/UTkarsh87020/Bharat_Express) |
+| **Production Branch**| `main` |
+| **Build Command** | `npm install` |
+| **Start Command** | `node server.js` |
+| **Port Binding** | `process.env.PORT \|\| 3005` (dynamic cloud container port) |
+| **SSL / TLS** | Auto-managed Let's Encrypt Wildcard SSL (HTTPS enabled) |
+| **CI/CD Pipeline** | Automated continuous deployment on every `git push origin main` |
+
+### Continuous Deployment Workflow
+1. **Code Push**: Changes committed locally are pushed to GitHub `origin/main`.
+2. **Webhook Trigger**: Render's automated GitHub Integration detects the commit instantly.
+3. **Build Phase**: Render spins up the container, runs `npm install`, and verifies dependencies.
+4. **Live Rollout**: The Express HTTP server starts on the assigned cloud port and the CDN edge updates within ~60 seconds with zero downtime.
 
 ---
 
