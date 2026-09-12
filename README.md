@@ -10,10 +10,11 @@
 [![Express](https://img.shields.io/badge/Express.js-4.18.2-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
 [![Leaflet](https://img.shields.io/badge/Leaflet.js-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com)
 [![ESRI Dark Canvas](https://img.shields.io/badge/Cartography-ESRI%20Dark%20Gray-007AC2?style=for-the-badge&logo=esri&logoColor=white)](https://www.esri.com)
+[![Render Live](https://img.shields.io/badge/Render-Live%20Control%20Room-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://fasttrack-delivery.onrender.com/)
 [![Made in India](https://img.shields.io/badge/Made%20in-India-FF9933?style=for-the-badge&logo=india&logoColor=white)](https://en.wikipedia.org/wiki/India)
 [![License](https://img.shields.io/badge/License-MIT-00e5ff?style=for-the-badge)](LICENSE)
 
-[🚀 Launch Control Room](http://localhost:3005) • [📖 Section Knowledge Base](#-system-sections--operational-knowledge) • [🗺️ Indian Spatial Hubs](#️-interactive-indian-map--telemetry) • [🤖 AI Routing Engine](#-ai-routing-engine--algorithms) • [📡 API Reference](#-rest-api-documentation) • [⚡ Setup Guide](#-quick-start--installation)
+[🚀 Launch Live Demo (Render)](https://fasttrack-delivery.onrender.com/) • [💻 Local Control Room](http://localhost:3005) • [📖 Section Knowledge Base](#-system-sections--operational-knowledge) • [🗺️ Indian Spatial Hubs](#️-interactive-indian-map--telemetry) • [🤖 AI Routing Engine](#-ai-routing-engine--algorithms) • [📡 API Reference](#-rest-api-documentation) • [⚡ Setup Guide](#-quick-start--installation)
 
 </div>
 
@@ -458,6 +459,9 @@ npm start
 ```
 
 ### 3. Open in Browser
+- **🌐 Live Production (Render)**: [https://fasttrack-delivery.onrender.com/](https://fasttrack-delivery.onrender.com/)
+- **💻 Local Development**: [http://localhost:3005](http://localhost:3005)
+
 Navigate your browser to:
 ```
 http://localhost:3005
