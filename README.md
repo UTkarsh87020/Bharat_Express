@@ -23,22 +23,27 @@
 
 1. [Executive Summary & Company Background](#-executive-summary--company-background)
 2. [Key Architecture & UI Design System](#-key-architecture--ui-design-system)
-3. [System Sections & Operational Knowledge](#-system-sections--operational-knowledge)
+3. [Responsive Architecture & Mobile-Friendly Experience](#-responsive-architecture--mobile-friendly-experience)
+   - [💻 Laptop Resolution Tuning (1366 × 768 / 1280 × 800)](#-laptop-resolution-tuning-1366--768--1280--800)
+   - [📲 Mobile-First Experience (360px – 480px)](#-mobile-first-experience-360px--480px)
+4. [System Sections & Operational Knowledge](#-system-sections--operational-knowledge)
    - [🏠 1. Home (`#home`)](#1--home-overview--pillars)
    - [🎛️ 2. Dashboard (`#dashboard`)](#2-️-dashboard-live-control-room)
-   - [🗺️ 3. Maps (`#maps`)](#3-️-maps-spatial-hubs--geofences)
-   - [🧭 4. Routes (`#routes`)](#4--routes-ai-engine--safe-path-locks)
-   - [🚚 5. Fleet (`#fleet`)](#5--fleet-roster--ev-telemetry)
-   - [📊 6. Analytics (`#analytics`)](#6--analytics-financials--sla)
-   - [⚙️ 7. Settings (`#settings`)](#7-️-settings-automation--safety-governors)
-   - [💡 8. Knowledge Drawer & Diagnostics](#8--knowledge-drawer-diagnostics--radio)
-4. [Interactive Indian Map & Telemetry](#️-interactive-indian-map--telemetry)
-5. [AI Routing Engine & Algorithms](#-ai-routing-engine--algorithms)
-6. [Hardware Telemetry Gauges & Canvas Visualizations](#-hardware-telemetry-gauges--canvas-visualizations)
-7. [REST API Documentation & Payload Reference](#-rest-api-documentation)
-8. [Quick Start & Installation](#-quick-start--installation)
-9. [Keyboard Shortcuts & Dispatch Ergonomics](#-keyboard-shortcuts--dispatch-ergonomics)
-10. [Project Directory Structure](#-project-directory-structure)
+   - [📦 3. Orders & Consignments (`#orders`)](#3--orders--consignments-orders)
+   - [🗺️ 4. Maps (`#maps`)](#4-️-maps-spatial-hubs--geofences)
+   - [🧭 5. Routes (`#routes`)](#5--routes-ai-engine--safe-path-locks)
+   - [🚚 6. Fleet (`#fleet`)](#6--fleet-roster--ev-telemetry)
+   - [📊 7. Analytics (`#analytics`)](#7--analytics-financials--sla)
+   - [⚙️ 8. Settings (`#settings`)](#8-️-settings-automation--safety-governors)
+   - [🚨 9. Emergency Police SOS, Booking Checkout & Modals](#9--emergency-police-sos-booking-checkout--modals)
+   - [💡 10. Knowledge Drawer, Diagnostics & Radio](#10--knowledge-drawer-diagnostics--radio)
+5. [Interactive Indian Map & Telemetry](#️-interactive-indian-map--telemetry)
+6. [AI Routing Engine & Algorithms](#-ai-routing-engine--algorithms)
+7. [Hardware Telemetry Gauges & Canvas Visualizations](#-hardware-telemetry-gauges--canvas-visualizations)
+8. [REST API Documentation & Payload Reference](#-rest-api-documentation)
+9. [Quick Start & Installation](#-quick-start--installation)
+10. [Keyboard Shortcuts & Dispatch Ergonomics](#-keyboard-shortcuts--dispatch-ergonomics)
+11. [Project Directory Structure](#-project-directory-structure)
 
 ---
 
@@ -85,6 +90,45 @@ Bharat Express is designed to feel like an aerospace-grade command and control c
   - 🔵 **Electric Cyan (`#00e5ff`)**: Primary active courier tracks (`FT-409`), telemetry gauges, floating AI curves.
   - 🔴 **Crimson SOS (`#ef4444`)**: Emergency alerts, speed governor violations, SOS police broadcasts.
 - **Cartography**: **ESRI World Dark Gray Canvas** (`World_Dark_Gray_Base` + `World_Dark_Gray_Reference`). 100% free, tile-watermark-free, zero API-key dependencies, rapid CDN caching.
+- **1-Click Collapsible Floating HUDs**: Map control cards (`Active Route Tracker` and `AI Route Optimizer`) feature instantaneous `[−]` / `[+]` toggle buttons that collapse into compact cyber tags, unblocking the entire live map canvas on demand.
+
+---
+
+## 📱 Responsive Architecture & Mobile-Friendly Experience
+
+Bharat Express delivers an uncompromising responsive experience, automatically optimizing its ergonomics whether accessed from a dual-monitor dispatch desk, a standard laptop, or a smartphone on the go:
+
+### 💻 Laptop Resolution Tuning (1366 × 768 / 1280 × 800)
+- **Zero Cutoff Layout**: All elements are dynamically proportioned using responsive CSS clamping and auto-scaling telemetry gauges.
+- **100% Text & Action Button Visibility**: Every word, driver status row, and all 5 primary action buttons (`+ Book Consignment`, `Assign Driver`, `Live Chat`, `🚨 SOS Police`, `Optimize Now`) fit comfortably within standard laptop browser viewports without vertical overflow.
+- **Single-Row Navigation Tabs**: Navigation items dynamically scale spacing with `clamp()`, ensuring all 8 sections remain on a single line on smaller laptop screens with zero awkward line wraps.
+
+<div align="center">
+  <img src="docs/screenshots/laptop_fit_1366.png" alt="Bharat Express Dashboard on Laptop (1366x768)" width="95%"/>
+  <p><em>Fig 1: Live Control Room fitted for standard 1366×768 laptop resolution with 100% visible action buttons and unclipped text.</em></p>
+</div>
+
+### 📲 Mobile-First Experience (360px – 480px)
+- **Thumb-Friendly Bottom Navigation (`.mobile-bottom-nav`)**: Fixed 56px bottom bar with 1-tap switching between **Live Map**, **Telemetry**, **Orders**, **Fleet**, and **Settings**.
+- **Unobstructed Map Stage**: Floating AI HUD cards automatically collapse into compact chips on mobile, giving dispatchers a full interactive map canvas.
+- **Floating Action Button (`.mobile-telemetry-fab`)**: Elevated button (`bottom: 74px`) enables instant thumb access to live driver telemetry and operations without blocking the map.
+- **Slide-Up Telemetry Sheet**: 1-click slide-up panel with a dedicated `← Return to Live Map` button.
+- **Mobile Orders & Consignments**: Responsive tabular cards with stacked KPIs, instant status filters, and live shipment tracking.
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><strong>🗺️ Mobile Live Map</strong></td>
+      <td align="center"><strong>📊 Slide-Up Telemetry Sheet</strong></td>
+      <td align="center"><strong>📦 Mobile Orders View</strong></td>
+    </tr>
+    <tr>
+      <td><img src="docs/screenshots/mobile_map_view.png" alt="Mobile Live Map" width="260"/></td>
+      <td><img src="docs/screenshots/mobile_telemetry_view.png" alt="Mobile Telemetry" width="260"/></td>
+      <td><img src="docs/screenshots/mobile_orders_view.png" alt="Mobile Orders" width="260"/></td>
+    </tr>
+  </table>
+</div>
 
 ---
 
@@ -117,7 +161,18 @@ Every section within Bharat Express provides specialized tools and dedicated ope
   - *Order Breakdown Donut*: Live visual distribution of completed (65%), in-transit (25%), and pending (10%) parcels.
   - *Active Driver Roster*: Live cards with phone dials, vehicle numbers, rating stars, and one-click order assignment.
 
-### 3. 🗺️ Maps (`#maps`) - Spatial Hubs & Geofences
+### 3. 📦 Orders & Consignments (`#orders`) - Lifecycle & Dispatch
+*Comprehensive shipment management, search, and tracking interface.*
+- **Status Filtering Tabs**: Instant 1-click filtering by delivery lifecycle:
+  - `All Orders`
+  - `In Transit` (Active couriers on the road)
+  - `Out for Delivery` (Last-mile courier approaches)
+  - `Delivered` (Signed drops with timestamp)
+  - `Delayed / Exception` (Weather/traffic rerouted)
+- **Live Search**: Rapid text search filtering by Consignment ID (e.g. `BE-9921`), customer name, or destination hub.
+- **1-Click Tracking Modal**: Clicking `Track Order` pops up an interactive waypoint tracker showing pickup time, intermediate hubs, current GPS position, and estimated time of arrival (ETA).
+
+### 4. 🗺️ Maps (`#maps`) - Spatial Hubs & Geofences
 *Comprehensive spatial management across Indian urban centers.*
 - **Hub Architecture**:
   - **Delhi NCR Hub**: Covering Connaught Place, Dhaula Kuan, NH-48 Airport Highway, Cyber City Gurgaon, Noida Sector 62, and Mayur Vihar.
@@ -128,7 +183,7 @@ Every section within Bharat Express provides specialized tools and dedicated ope
   - **Stationary Idle Violation**: Vehicles inactive for >7 minutes outside designated rest bays trigger a supervisor check-in ping.
   - **Expressway High-Speed Corridor**: Speed governor automatically expands to 80 km/h on access-controlled expressways.
 
-### 4. 🧭 Routes (`#routes`) - AI Engine & Safe-Path Locks
+### 5. 🧭 Routes (`#routes`) - AI Engine & Safe-Path Locks
 *Detailed algorithm inspection, performance benchmarking, and safety policies.*
 - **4 AI Routing Algorithms**:
   1. *Greedy Nearest-Neighbour*: Instant Euclidean/Manhattan heuristic (<5ms execution) for low-density drops.
@@ -139,7 +194,7 @@ Every section within Bharat Express provides specialized tools and dedicated ope
   - High-value consignments allow the sender or receiver to specify mandatory waypoints (e.g. Ring Road, well-lit main avenues).
   - The optimizer locks these coordinates into the waypoint graph, mathematically preventing couriers from taking unlit alleys or unverified shortcuts.
 
-### 5. 🚚 Fleet (`#fleet`) - Roster & EV Telemetry
+### 6. 🚚 Fleet (`#fleet`) - Roster & EV Telemetry
 *Vehicle health, powertrain monitoring, and preventive maintenance.*
 - **Vehicle Roster**: Detailed monitoring of 50+ vehicles across 4 distinct classes:
   - *Electric Delivery Scooters (Ola S1 Pro / Ather 450X)*: Tailored for hyperlocal 0–10 km drops, 140 km battery range.
@@ -150,7 +205,7 @@ Every section within Bharat Express provides specialized tools and dedicated ope
   - Real-time battery temperature and cycle health alerts.
   - Automated return-to-base triggers when battery falls below 18% remaining charge.
 
-### 6. 📊 Analytics (`#analytics`) - Financials & SLA
+### 7. 📊 Analytics (`#analytics`) - Financials & SLA
 *Enterprise business telemetry and operational efficiency reporting.*
 - **Key Financial & Operational KPIs**:
   - Daily Gross Revenue: **₹1,42,850**
@@ -159,14 +214,27 @@ Every section within Bharat Express provides specialized tools and dedicated ope
   - CO₂ Emissions Offset: **412 kg / day** via EV adoption
 - **Trend Charts**: Dynamic weekly throughput curves, revenue per route comparison, and driver earnings breakdowns.
 
-### 7. ⚙️ Settings (`#settings`) - Automation & Safety Governors
+### 8. ⚙️ Settings (`#settings`) - Automation & Safety Governors
 *Configurable operational rules, dispatch limits, and telemetry parameters.*
 - **Automated Dispatch Toggle**: Enables instant AI order assignment without requiring manual dispatcher review.
 - **Speed Governor Ceiling**: Global alert threshold set to 65 km/h for city couriers (110 km/h for expressway trucks).
 - **Driver Rest Rule**: Enforces a mandatory 15-minute hydration break every 3.5 hours of continuous riding.
 - **Emergency Police Sync**: Direct link with Delhi Police / UP Police 112 emergency response network.
 
-### 8. 💡 Knowledge Drawer, Diagnostics & Radio
+### 9. 🚨 Emergency Police SOS, Booking Checkout & Modals
+- **1-Click Emergency SOS Broadcast (`🚨 SOS Police`)**:
+  - Directly dispatches an emergency priority vector to the nearest Delhi Police PCR van (`PCR-07` on Barakhamba Road).
+  - Integrates with Delhi Police Control Room `112` and activates the audio siren beacon.
+  - Logs live SOS incidents in system telemetry with incident coordinates and timestamp.
+- **Consignment Booking Checkout Modal (`+ Book Consignment`)**:
+  - Complete dispatch creation workflow: sender address, recipient hub, priority tier, and vehicle class (EV 2W, 3W Cargo, 4W CNG, Heavy Truck).
+  - Real-time dynamic pricing calculation in Indian Rupees (₹) with instant consignment confirmation.
+- **Driver Assignment Modal (`Assign Driver`)**:
+  - Quick-pair pending consignment drops with active on-duty couriers based on geofence proximity and current payload capacity.
+- **Operator Profile Modal (`Alex Chen / Senior Dispatcher`)**:
+  - Displays dispatcher credentials, duty shift timings, station ID, and active security tier with persistent `localStorage`.
+
+### 10. 💡 Knowledge Drawer, Diagnostics & Radio
 - **Slide-Over Knowledge Drawer (`?` key or top button)**: Instant access to standard operating procedures, SOS incident playbooks, and dispatcher training tips.
 - **System Diagnostics Modal (`i` key or top button)**: Live verification of backend server heartbeat (`http://localhost:3005/api/health`), Leaflet tile engine status, and memory consumption.
 - **Dispatch Radio Drawer (`R` key or bottom badge)**: Real-time broadcast logs, traffic audio memos, and automated weather advisory messages.
@@ -431,6 +499,13 @@ FastTrack-Delivery/
 ├── 📦 package.json               # Project manifest, dependencies, and launch scripts
 ├── 📖 README.md                  # Comprehensive engineering & operations documentation
 ├── 📄 REPORT_CONTENT.md         # Academic report, system specifications, and algorithms
+├── 📁 docs/                      # Documentation and visual artifacts
+│   └── 📁 screenshots/           # Laptop & mobile responsive screenshots
+│       ├── laptop_fit_1366.png
+│       ├── mobile_map_view.png
+│       ├── mobile_telemetry_view.png
+│       ├── mobile_orders_view.png
+│       └── new_dashboard_1920.png
 └── 📁 public/                    # Client frontend assets
     ├── 🌐 index.html             # Modular single-page control room (Home, Dash, Map, etc.)
     ├── 🎨 styles.css             # Cyber-logistics dark design system & animations

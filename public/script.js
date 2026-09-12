@@ -8,7 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initChartsAndGauges();
   initInteractions();
   initClock();
+  loadSettingsFromStorage();
   loadLiveApiData(); // Fetch real data from backend API
+  initCardCollapses();
+  initMobileNavigation();
 });
 
 // Global state
@@ -16,6 +19,14 @@ let map = null;
 let routesLayers = {};
 let vanMarkers = {};
 let currentRegionIndex = 0;
+let selectedRouteKey = "FT-409";
+let navModeActive = false;
+let currentEmergencyCoords = { lat: 28.6250, lng: 77.2400 };
+let currentNearestStation = null;
+let emergencyMapMarker = null;
+let emergencyMapCircle = null;
+let emergencyPoliceMarker = null;
+let emergencyPoliceLine = null;
 
 // Indian Logistics Hub Regions
 const INDIAN_REGIONS = [
@@ -286,11 +297,36 @@ function initIndianMap() {
     });
   }
 
+  // Navigation Mode Toggle
+  const btnNavMode = document.getElementById("tool-nav-mode");
+  if (btnNavMode) {
+    btnNavMode.addEventListener("click", () => {
+      navModeActive = !navModeActive;
+      btnNavMode.classList.toggle("active", navModeActive);
+
+      if (navModeActive) {
+        const activeRouteKey = selectedRouteKey || "FT-409";
+        const r = routeDefinitions[activeRouteKey];
+        if (r && map) {
+          map.flyTo(r.vanPosition, 14.5, { duration: 1.2 });
+          showToast(
+            "Navigation Mode Active 🧭",
+            `Following ${r.vanId} (${r.driver}) along ${r.name}. Turn-by-turn tracking enabled.`
+          );
+        }
+      } else {
+        map.flyTo(defaultRegion.center, defaultRegion.zoom, { duration: 1.2 });
+        showToast("Navigation Mode Off", "Restored standard operational overview.");
+      }
+    });
+  }
+
   // Continuous subtle van motion along Indian streets
   startVanSimulation();
 }
 
 function selectRoute(routeKey) {
+  selectedRouteKey = routeKey;
   const target = routesLayers[routeKey];
   if (!target || !map) return;
 
@@ -395,13 +431,16 @@ async function loadLiveApiData() {
     drawDonutChart(completedCount / total, inTransitCount / total, delayedCount / total);
   }
 
-  // 3. Fetch Drivers & Populate Drivers Panel
+  // 3. Fetch & Render Orders Management Roster
+  await loadOrdersData();
+
+  // 4. Fetch Drivers & Populate Drivers Panel
   const driversRes = await fetchApi("/api/drivers");
   if (driversRes && driversRes.success && Array.isArray(driversRes.data) && driversRes.data.length > 0) {
     updateDriversTable(driversRes.data);
   }
 
-  // 4. Fetch Notifications & Append to Live Chat Radio
+  // 5. Fetch Notifications & Append to Live Chat Radio
   const notifRes = await fetchApi("/api/notifications");
   if (notifRes && notifRes.success && Array.isArray(notifRes.data) && notifRes.data.length > 0) {
     const chatMessages = document.getElementById("chatMessages");
@@ -415,6 +454,544 @@ async function loadLiveApiData() {
     }
   }
 }
+
+// Global State for Orders View
+let currentOrdersList = [];
+let ordersActiveFilter = 'all';
+
+async function loadOrdersData() {
+  const res = await fetchApi("/api/orders");
+  if (res && res.success && Array.isArray(res.data)) {
+    currentOrdersList = res.data;
+    renderOrdersTable();
+    updateOrdersKpiSummary(res.data);
+  }
+}
+
+function updateOrdersKpiSummary(orders) {
+  const pending = orders.filter(o => o.status === 'pending').length;
+  const transit = orders.filter(o => o.status === 'out-for-delivery' || o.status === 'dispatched').length;
+  const completed = orders.filter(o => o.status === 'completed').length;
+  const totalVal = orders.reduce((sum, o) => sum + (Number(o.orderValue) || 0), 0);
+
+  const pendingEl = document.getElementById("orders-pending-count");
+  const transitEl = document.getElementById("orders-transit-count");
+  const completedEl = document.getElementById("orders-completed-count");
+  const totalValEl = document.getElementById("orders-total-val");
+  const tableCountEl = document.getElementById("orders-table-count");
+
+  if (pendingEl) pendingEl.textContent = pending;
+  if (transitEl) transitEl.textContent = transit;
+  if (completedEl) completedEl.textContent = completed;
+  if (totalValEl) totalValEl.textContent = `₹${totalVal.toLocaleString('en-IN')}`;
+  if (tableCountEl) tableCountEl.textContent = `${orders.length} total shipments registered`;
+}
+
+function renderOrdersTable() {
+  const tbody = document.getElementById("ordersTableBody");
+  if (!tbody) return;
+
+  const searchQuery = document.getElementById("ordersSearchInput")?.value.toLowerCase().trim() || "";
+
+  const filtered = currentOrdersList.filter(order => {
+    // Status filter
+    if (ordersActiveFilter !== 'all') {
+      if (ordersActiveFilter === 'pending' && order.status !== 'pending') return false;
+      if (ordersActiveFilter === 'out-for-delivery' && order.status !== 'out-for-delivery' && order.status !== 'dispatched') return false;
+      if (ordersActiveFilter === 'completed' && order.status !== 'completed') return false;
+    }
+
+    // Search query
+    if (searchQuery) {
+      const matchName = (order.customerName || "").toLowerCase().includes(searchQuery);
+      const matchPickup = (order.pickupAddress || "").toLowerCase().includes(searchQuery);
+      const matchDrop = (order.deliveryAddress || "").toLowerCase().includes(searchQuery);
+      const matchId = String(order.id).includes(searchQuery);
+      return matchName || matchPickup || matchDrop || matchId;
+    }
+
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" style="text-align: center; padding: 30px; color: var(--text-secondary);">
+          <div style="font-size: 1.5rem; margin-bottom: 6px;">📦</div>
+          <div>No consignments found matching the current filters.</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(order => {
+    const isPending = order.status === 'pending';
+    const isTransit = order.status === 'out-for-delivery' || order.status === 'dispatched';
+    const isCompleted = order.status === 'completed';
+
+    const statusClass = isCompleted ? 'badge-active' : (isTransit ? 'badge-on-route' : 'badge-pending');
+    const statusText = isCompleted ? 'Delivered' : (isTransit ? 'In Transit' : 'Pending');
+
+    const priorityClass = order.priority === 'high' ? 'priority-high' : (order.priority === 'low' ? 'priority-low' : 'priority-medium');
+    const isSafeLock = order.routePreference === 'customer';
+    const policyClass = isSafeLock ? 'policy-lock' : 'policy-ai';
+    const policyText = isSafeLock ? '🔒 Safe Locked' : '⚡ AI Dynamic';
+
+    const waypointsList = Array.isArray(order.customWaypoints) ? order.customWaypoints : [];
+    const viaHtml = isSafeLock && waypointsList.length > 0
+      ? `<span class="route-via-pill">via ${escapeHtml(waypointsList[0])}${waypointsList.length > 1 ? ` (+${waypointsList.length - 1})` : ''}</span>`
+      : '';
+
+    const driverName = order.assignedDriver
+      ? `Driver #${order.assignedDriver}`
+      : `<span style="color: var(--text-secondary); font-style: italic;">Unassigned</span>`;
+
+    return `
+      <tr data-order-id="${order.id}">
+        <td><span class="order-id-badge">#ORD-${order.id}</span></td>
+        <td>
+          <div class="order-customer-cell">
+            <span class="order-cust-name">${escapeHtml(order.customerName)}</span>
+            <span class="order-cust-phone">${escapeHtml(order.customerPhone || 'N/A')}</span>
+          </div>
+        </td>
+        <td>
+          <div class="order-route-cell">
+            <span class="route-from-to"><b>From:</b> ${escapeHtml(order.pickupAddress)}</span>
+            <span class="route-from-to"><b>To:</b> ${escapeHtml(order.deliveryAddress)}</span>
+            ${viaHtml}
+          </div>
+        </td>
+        <td><span class="priority-pill ${priorityClass}">${escapeHtml(order.priority || 'standard')}</span></td>
+        <td><strong>₹${Number(order.orderValue || 0).toLocaleString('en-IN')}</strong></td>
+        <td><span class="policy-badge ${policyClass}">${policyText}</span></td>
+        <td>${driverName}</td>
+        <td><span class="badge-status ${statusClass}">${statusText}</span></td>
+        <td>
+          <div class="order-actions-cell">
+            <button class="btn-action-sm" onclick="trackOrderDirect(${order.id})" title="Track Live Telemetry">Track</button>
+            ${isPending ? `<button class="btn-action-sm btn-dispatch-sm" onclick="dispatchOrderDirect(${order.id}, '${order.routePreference}')" title="Dispatch Driver">Dispatch</button>` : ''}
+            <button class="btn-action-sm" onclick="predictOrderDirect(${order.id})" title="Run AI Prediction">Predict</button>
+            <button class="btn-action-sm" onclick="notifyOrderDirect(${order.id})" title="Notify Customer">SMS</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+// Global action handlers for order row buttons
+window.trackOrderDirect = async function(orderId) {
+  openTrackOrderModal(orderId);
+};
+
+window.dispatchOrderDirect = async function(orderId, preferredMode) {
+  const mode = preferredMode === 'customer' ? 'customer' : 'fasttrack';
+  showToast("Dispatching...", `Deploying courier for Order #${orderId} on ${mode === 'customer' ? 'Customer Safety Route' : 'FastTrack AI Route'}`);
+
+  const res = await fetchApi(`/api/orders/${orderId}/dispatch`, {
+    method: 'POST',
+    body: JSON.stringify({ routeMode: mode })
+  });
+
+  if (res && res.success) {
+    showToast("Dispatched! 🚀", res.message || `Order #${orderId} is now out for delivery.`);
+    await loadLiveApiData();
+    await loadOrdersData();
+  } else {
+    showToast("Dispatch Failed", res?.message || "Could not dispatch order.");
+  }
+};
+
+window.predictOrderDirect = async function(orderId) {
+  const res = await fetchApi(`/api/ai/predict/${orderId}`);
+  if (res && res.success && res.prediction) {
+    const p = res.prediction;
+    showToast(
+      `AI Prediction: Order #${orderId}`,
+      `ETA: ${p.estimatedDeliveryTime} (Confidence: ${p.confidence}). ${p.riskFactors?.length ? `⚠️ ${p.riskFactors[0]}` : 'Optimal traffic conditions.'}`
+    );
+  } else {
+    showToast("Prediction Error", "Could not fetch AI predictions for this order.");
+  }
+};
+
+window.notifyOrderDirect = async function(orderId) {
+  const res = await fetchApi(`/api/notify/${orderId}`, { method: 'POST' });
+  if (res && res.success) {
+    showToast("SMS Dispatched 📱", `Delivery alert notification sent to customer for Order #${orderId}.`);
+  } else {
+    showToast("Notification Failed", res?.message || "Could not send customer notification.");
+  }
+};
+
+// Modal Tracking Timeline
+async function openTrackOrderModal(orderId) {
+  const modal = document.getElementById("trackOrderModal");
+  const modalBody = document.getElementById("trackModalBody");
+  const heading = document.getElementById("trackModalHeading");
+  const subhead = document.getElementById("trackModalSubhead");
+  const notifyBtn = document.getElementById("modalNotifyBtn");
+
+  if (!modal || !modalBody) return;
+
+  heading.textContent = `Consignment Radar: #ORD-${orderId}`;
+  subhead.textContent = `Fetching real-time telemetry from GPS mesh network...`;
+  modal.hidden = false;
+
+  modalBody.innerHTML = `
+    <div style="text-align: center; padding: 40px; color: var(--neon-cyan);">
+      <div style="font-size: 1.8rem; animation: pulse 1s infinite;">📡</div>
+      <p style="margin-top: 8px; font-size: 0.8rem;">Querying live telemetry feed...</p>
+    </div>
+  `;
+
+  // Fetch tracking data & AI prediction simultaneously
+  const [trackRes, predictRes] = await Promise.all([
+    fetchApi(`/api/track/${orderId}`),
+    fetchApi(`/api/ai/predict/${orderId}`)
+  ]);
+
+  if (!trackRes || !trackRes.success || !trackRes.data) {
+    modalBody.innerHTML = `
+      <div style="text-align: center; padding: 30px; color: #ef4444;">
+        <p>Order #${orderId} was not found or has expired from memory.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const track = trackRes.data;
+  const predict = predictRes?.prediction || null;
+  const isSafeLock = track.routePreference === 'customer';
+
+  // Wire notify button in modal
+  if (notifyBtn) {
+    notifyBtn.onclick = () => notifyOrderDirect(orderId);
+  }
+
+  // Determine timeline step status
+  const isCompleted = track.status === 'completed';
+  const isTransit = track.status === 'out-for-delivery' || track.status === 'dispatched';
+
+  modalBody.innerHTML = `
+    <!-- Progress Timeline -->
+    <div class="track-timeline-container">
+      <div class="timeline-step completed">
+        <div class="timeline-dot">✓</div>
+        <span class="timeline-label">Order Placed</span>
+        <span class="timeline-time">${new Date(track.timeline?.[0]?.time || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+      </div>
+
+      <div class="timeline-step completed">
+        <div class="timeline-dot">✓</div>
+        <span class="timeline-label">Confirmed</span>
+        <span class="timeline-time">Mesh Synced</span>
+      </div>
+
+      <div class="timeline-step ${isTransit || isCompleted ? (isCompleted ? 'completed' : 'active') : ''}">
+        <div class="timeline-dot">${isCompleted ? '✓' : '🚚'}</div>
+        <span class="timeline-label">In Transit</span>
+        <span class="timeline-time">${isTransit ? 'Moving' : (isCompleted ? 'Finished' : 'Queued')}</span>
+      </div>
+
+      <div class="timeline-step ${isCompleted ? 'completed' : ''}">
+        <div class="timeline-dot">${isCompleted ? '✓' : '📍'}</div>
+        <span class="timeline-label">Delivered</span>
+        <span class="timeline-time">${isCompleted ? 'Doorstep Handover' : 'Pending'}</span>
+      </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="track-info-grid">
+      <!-- Card 1: Assigned Driver & Vehicle -->
+      <div class="track-detail-card">
+        <h4>Assigned Delivery Agent</h4>
+        ${track.driver ? `
+          <div class="track-detail-row"><span>Driver Name:</span><span>${escapeHtml(track.driver.name)}</span></div>
+          <div class="track-detail-row"><span>Contact:</span><span>${escapeHtml(track.driver.phone)}</span></div>
+          <div class="track-detail-row"><span>Vehicle Type:</span><span>${escapeHtml(track.driver.vehicle)}</span></div>
+          <div class="track-detail-row"><span>Performance Rating:</span><span>⭐ ${track.driver.rating} / 5.0</span></div>
+          <div class="track-detail-row"><span>Current GPS Cell:</span><span style="color: var(--neon-mint);">${escapeHtml(track.currentLocation || 'En Route')}</span></div>
+        ` : `
+          <p style="color: var(--text-secondary); font-size: 0.78rem;">No driver assigned yet. Will be allocated upon dispatch.</p>
+        `}
+      </div>
+
+      <!-- Card 2: Route Policy & Safe Checkpoints -->
+      <div class="track-detail-card">
+        <h4>Navigation Policy &amp; Checkpoints</h4>
+        <div class="track-detail-row">
+          <span>Active Route Policy:</span>
+          <span style="color: ${isSafeLock ? '#ff9933' : '#00e5ff'};">${isSafeLock ? '🔒 Customer Safe-Path Lock' : '⚡ FastTrack AI Dynamic'}</span>
+        </div>
+        <div class="track-detail-row"><span>Lifecycle State:</span><span style="text-transform: capitalize;">${escapeHtml(track.status)}</span></div>
+        <div class="track-detail-row"><span>Target ETA:</span><span>${track.estimatedArrival ? new Date(track.estimatedArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '30 mins'}</span></div>
+        ${Array.isArray(track.customWaypoints) && track.customWaypoints.length > 0 ? `
+          <div style="margin-top: 8px;">
+            <span style="font-size: 0.7rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">Mandatory Safe Checkpoints:</span>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              ${track.customWaypoints.map(wp => `<span class="route-via-pill">📍 ${escapeHtml(wp)}</span>`).join("")}
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+
+    <!-- AI Delivery Predictor Card -->
+    ${predict ? `
+      <div class="ai-prediction-box">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <strong style="color: var(--neon-cyan); font-size: 0.8rem;">🤖 Machine Learning Delivery Window Analysis</strong>
+          <span class="ai-confidence-pill">${predict.confidence} Confidence</span>
+        </div>
+        <div class="track-detail-row"><span>Estimated Doorstep Window:</span><strong style="color: #ffffff;">${predict.estimatedDeliveryTime}</strong></div>
+        ${predict.riskFactors && predict.riskFactors.length > 0 ? `
+          <div class="track-detail-row" style="color: #fb923c;"><span>Traffic Advisory:</span><span>⚠️ ${predict.riskFactors[0]}</span></div>
+        ` : `
+          <div class="track-detail-row" style="color: var(--neon-mint);"><span>Traffic Advisory:</span><span>✓ Clear corridor flow</span></div>
+        `}
+      </div>
+    ` : ''}
+  `;
+}
+
+/* ==========================================================================
+   EMERGENCY SOS & POLICE MESH (112 PROTOCOL)
+   ========================================================================== */
+
+async function openEmergencyModal(options = {}) {
+  const modal = document.getElementById("emergencyModal");
+  if (!modal) return;
+
+  if (options.lat && options.lng) {
+    currentEmergencyCoords = { lat: Number(options.lat), lng: Number(options.lng) };
+    const locSelect = document.getElementById("emergencyLocationSelect");
+    if (locSelect) locSelect.value = "custom";
+    const customWrap = document.getElementById("customCoordsWrap");
+    if (customWrap) customWrap.hidden = false;
+    const latInp = document.getElementById("emergencyCustomLat");
+    const lngInp = document.getElementById("emergencyCustomLng");
+    if (latInp) latInp.value = currentEmergencyCoords.lat;
+    if (lngInp) lngInp.value = currentEmergencyCoords.lng;
+  }
+
+  if (options.orderId) {
+    const orderInp = document.getElementById("emergencyOrderId");
+    if (orderInp) orderInp.value = options.orderId;
+  }
+
+  modal.hidden = false;
+  await fetchNearestPoliceStations(currentEmergencyCoords.lat, currentEmergencyCoords.lng);
+}
+
+async function fetchNearestPoliceStations(lat, lng) {
+  const container = document.getElementById("policeMeshContainer");
+  if (!container) return;
+
+  container.innerHTML = `
+    <div style="text-align: center; padding: 25px; color: var(--neon-cyan);">
+      <div style="font-size: 1.6rem; animation: pulse 1s infinite;">📡</div>
+      <p style="margin-top: 6px; font-size: 0.78rem;">Triangulating nearest police mesh stations for [${lat.toFixed(4)}, ${lng.toFixed(4)}]...</p>
+    </div>
+  `;
+
+  const res = await fetchApi(`/api/emergency/nearest-police?lat=${lat}&lng=${lng}`);
+
+  if (!res || !res.success || !res.nearest) {
+    container.innerHTML = `
+      <div class="primary-station-card" style="border-color: #ef4444;">
+        <h4 style="color: #ef4444;">⚠️ Police Mesh Telemetry Offline</h4>
+        <p style="font-size: 0.76rem; color: var(--text-secondary); margin: 6px 0 10px;">Could not connect to nearby police locator. Immediate manual action required:</p>
+        <a href="tel:112" class="btn-call-112" style="font-size: 0.85rem;">📞 Direct National Dial: 112 (Police: 100)</a>
+      </div>
+    `;
+    return;
+  }
+
+  currentNearestStation = res.nearest;
+
+  // Plot on Leaflet Map
+  if (map && window.L) {
+    // Clear previous emergency layers
+    if (emergencyMapMarker) map.removeLayer(emergencyMapMarker);
+    if (emergencyMapCircle) map.removeLayer(emergencyMapCircle);
+    if (emergencyPoliceMarker) map.removeLayer(emergencyPoliceMarker);
+    if (emergencyPoliceLine) map.removeLayer(emergencyPoliceLine);
+
+    // Emergency Origin Marker (Red Pulse)
+    const sosIcon = L.divIcon({
+      className: "sos-map-icon",
+      html: `<div style="background:#ef4444; color:#fff; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 0 15px #ef4444; border:2px solid #fff; animation:pulse 1s infinite;">🚨</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+    emergencyMapMarker = L.marker([lat, lng], { icon: sosIcon }).addTo(map);
+
+    emergencyMapCircle = L.circle([lat, lng], {
+      radius: 800,
+      color: "#ef4444",
+      fillColor: "#ef4444",
+      fillOpacity: 0.15,
+      weight: 2
+    }).addTo(map);
+
+    // Nearest Police Station Marker (Blue Badge)
+    if (res.nearest.lat && res.nearest.lng) {
+      const policeIcon = L.divIcon({
+        className: "police-map-icon",
+        html: `<div style="background:#00e5ff; color:#0d1524; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold; box-shadow:0 0 15px #00e5ff; border:2px solid #fff;">👮</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+      emergencyPoliceMarker = L.marker([res.nearest.lat, res.nearest.lng], { icon: policeIcon })
+        .bindPopup(`<b>${escapeHtml(res.nearest.name)}</b><br>${escapeHtml(res.nearest.address || 'Precinct')}<br>Distance: ${res.nearest.distanceKm || '1.2'} km`)
+        .addTo(map);
+
+      emergencyPoliceLine = L.polyline([
+        [lat, lng],
+        [res.nearest.lat, res.nearest.lng]
+      ], {
+        color: "#ef4444",
+        weight: 3,
+        dashArray: "6, 8",
+        opacity: 0.9
+      }).addTo(map);
+    }
+  }
+
+  const nearest = res.nearest;
+  const secondaryStations = Array.isArray(res.stations) ? res.stations.slice(1, 5) : [];
+
+  container.innerHTML = `
+    <!-- Primary Station Card -->
+    <div class="primary-station-card">
+      <div class="station-card-top">
+        <div class="station-name-wrap">
+          <span class="station-badge-nearest">Primary Nearest Station (Verified)</span>
+          <h4 style="margin-top: 4px;">👮 ${escapeHtml(nearest.name)}</h4>
+        </div>
+        <div class="station-meta-pills">
+          <span class="meta-pill pill-dist">📍 ${nearest.distanceKm || '1.2'} km away</span>
+          <span class="meta-pill pill-time">⚡ ~${nearest.travelTimeMin || '4'} mins drive</span>
+          <span class="meta-pill pill-source">${res.source === 'google-places' ? 'Google Places Live' : 'NCR Master Directory'}</span>
+        </div>
+      </div>
+
+      <p class="station-address">🏢 ${escapeHtml(nearest.address || 'Delhi NCR Police Station Precinct')}</p>
+
+      <div class="station-actions-row">
+        <a href="${res.googleMapsUrl || '#'}" target="_blank" rel="noopener" class="btn-gmaps-nav">
+          <span>🗺️ Open Turn-by-Turn GPS Escort</span>
+          <span style="font-size: 0.85rem;">↗</span>
+        </a>
+        <a href="tel:${nearest.phone || '112'}" class="btn-call-112">
+          <span>📞 Direct Hotline: ${nearest.phone || '112'}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Secondary Stations in Police Mesh -->
+    ${secondaryStations.length > 0 ? `
+      <div class="secondary-mesh-box">
+        <div class="secondary-mesh-title">Additional Police Stations within 5-10 km Radius</div>
+        <div class="secondary-stations-grid">
+          ${secondaryStations.map(st => `
+            <div class="secondary-station-item">
+              <span class="sec-name">👮 ${escapeHtml(st.name)}</span>
+              <div class="sec-info">
+                <span>📍 ${st.distanceKm || '3.5'} km · ~${st.travelTimeMin || '8'} mins</span>
+                <a href="tel:${st.phone || '112'}" style="color: var(--neon-cyan); text-decoration: none; font-weight: bold;">Dial ${st.phone || '112'}</a>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+async function broadcastEmergencySos() {
+  const btn = document.getElementById("btnBroadcastSos");
+  if (btn) btn.disabled = true;
+
+  const locSelect = document.getElementById("emergencyLocationSelect");
+  let lat = currentEmergencyCoords.lat;
+  let lng = currentEmergencyCoords.lng;
+
+  if (locSelect?.value === "custom") {
+    lat = parseFloat(document.getElementById("emergencyCustomLat")?.value) || lat;
+    lng = parseFloat(document.getElementById("emergencyCustomLng")?.value) || lng;
+  }
+
+  const orderId = parseInt(document.getElementById("emergencyOrderId")?.value) || null;
+  const reason = document.getElementById("emergencyTypeSelect")?.value || "threat";
+  const remarks = document.getElementById("emergencyDescription")?.value.trim() || "";
+  const stationName = currentNearestStation?.name || "Nearest Delhi NCR Police Station";
+
+  showToast("Transmitting SOS...", "Broadcasting distress alert to Police Mesh & Dispatch HQ");
+
+  await Promise.all([
+    fetchApi("/api/emergency/sos", {
+      method: "POST",
+      body: JSON.stringify({
+        lat,
+        lng,
+        stationName,
+        orderId,
+        description: `[${reason.toUpperCase()}] ${remarks || 'Field emergency beacon triggered by operator.'}`
+      })
+    }),
+    orderId ? fetchApi(`/api/emergency/${orderId}`, {
+      method: "POST",
+      body: JSON.stringify({
+        type: reason,
+        description: remarks || 'Emergency broadcast for consignment.'
+      })
+    }) : Promise.resolve(null)
+  ]);
+
+  if (btn) btn.disabled = false;
+
+  // Append SOS message to Dispatcher Chat / Radio
+  const chatMessages = document.getElementById("chatMessages");
+  if (chatMessages) {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const div = document.createElement("div");
+    div.className = "chat-msg driver";
+    div.style.borderLeft = "3px solid #ef4444";
+    div.style.background = "rgba(239, 68, 68, 0.15)";
+    div.innerHTML = `
+      <div class="chat-author" style="color: #ef4444;">🚨 CRITICAL SOS BEACON · ${time}</div>
+      <div class="chat-bubble" style="color: #fff;">
+        <b>Distress Beacon active at [${lat.toFixed(4)}, ${lng.toFixed(4)}]</b><br>
+        Police Station Routed: <b>${escapeHtml(stationName)}</b><br>
+        ${orderId ? `Linked Consignment: #ORD-${orderId}<br>` : ''}
+        Status: <b>112 Escort Link Dispatched</b>
+      </div>
+    `;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Close modal and focus map on emergency origin
+  const modal = document.getElementById("emergencyModal");
+  if (modal) modal.hidden = true;
+
+  switchSection("dashboard");
+  if (map) {
+    map.flyTo([lat, lng], 13.5, { duration: 1.5 });
+  }
+
+  showToast(
+    "🚨 SOS BROADCAST ACTIVE",
+    `Alert transmitted for ${stationName}. National emergency protocol (112) initiated.`
+  );
+}
+
+window.openEmergencyModal = openEmergencyModal;
+window.broadcastEmergencySos = broadcastEmergencySos;
 
 function updateDriversTable(apiDrivers) {
   const tbody = document.getElementById("driver-rows-body");
@@ -724,7 +1301,18 @@ function switchSection(name) {
     b.classList.toggle("active", b.dataset.tab === name);
   });
 
-  // 3. Switch Section View
+  // 3. Sync Mobile Bottom Navigation Buttons
+  document.querySelectorAll(".mobile-nav-btn").forEach((mb) => {
+    if (mb.dataset.tab === name) {
+      if (!mb.dataset.sub || mb.dataset.sub === "map") {
+        mb.classList.add("active");
+      }
+    } else {
+      mb.classList.remove("active");
+    }
+  });
+
+  // 4. Switch Section View
   const targetView = document.getElementById(`view-${name}`);
   document.querySelectorAll(".section-view").forEach((v) => {
     v.classList.remove("active");
@@ -737,11 +1325,16 @@ function switchSection(name) {
     if (dash) dash.classList.add("active");
   }
 
-  // 4. Invalidate map size if switching to dashboard
+  // 5. Invalidate map size if switching to dashboard
   if (name === "dashboard" && map) {
     setTimeout(() => {
       map.invalidateSize();
     }, 150);
+  }
+
+  // 6. If switching to orders view, reload live orders
+  if (name === "orders") {
+    loadOrdersData();
   }
 }
 
@@ -829,9 +1422,7 @@ function initInteractions() {
 
   const btnSaveSettings = document.getElementById("btn-save-settings");
   if (btnSaveSettings) {
-    btnSaveSettings.addEventListener("click", () => {
-      showToast("Settings Saved", "System dispatch thresholds and speed limits updated.");
-    });
+    btnSaveSettings.addEventListener("click", saveSettingsToStorage);
   }
 
   const btnRefreshFleet = document.getElementById("btn-refresh-fleet-view");
@@ -856,6 +1447,262 @@ function initInteractions() {
   const btnOptimize = document.getElementById("btn-optimize-now");
   if (btnOptimize) {
     btnOptimize.addEventListener("click", triggerRealAIOptimization);
+  }
+
+  // ==========================================================================
+  // Book Delivery / Checkout Modal Handlers (POST /api/orders)
+  // ==========================================================================
+  const checkoutModal = document.getElementById("checkoutModal");
+  const openCheckoutBtns = [
+    document.getElementById("btn-open-checkout-top"),
+    document.getElementById("btn-open-checkout-dash"),
+    document.getElementById("btn-open-checkout-orders")
+  ];
+  const closeCheckoutBtn = document.getElementById("closeCheckoutModal");
+  const cancelCheckoutBtn = document.getElementById("cancelCheckoutBtn");
+  const checkoutForm = document.getElementById("checkoutOrderForm");
+  const routeRadios = document.querySelectorAll('input[name="routePreference"]');
+  const customRouteWrap = document.getElementById("checkoutCustomRouteWrap");
+  const cardFasttrack = document.getElementById("cardFasttrackRoute");
+  const cardCustomer = document.getElementById("cardCustomerRoute");
+  const customWaypointsInput = document.getElementById("checkoutCustomWaypoints");
+
+  // Open modal
+  openCheckoutBtns.forEach((btn) => {
+    if (btn) {
+      btn.addEventListener("click", () => {
+        if (checkoutModal) checkoutModal.hidden = false;
+      });
+    }
+  });
+
+  // Close modal
+  const hideCheckoutModal = () => {
+    if (checkoutModal) checkoutModal.hidden = true;
+  };
+  if (closeCheckoutBtn) closeCheckoutBtn.addEventListener("click", hideCheckoutModal);
+  if (cancelCheckoutBtn) cancelCheckoutBtn.addEventListener("click", hideCheckoutModal);
+  if (checkoutModal) {
+    checkoutModal.addEventListener("click", (e) => {
+      if (e.target === checkoutModal) hideCheckoutModal();
+    });
+  }
+
+  // Route preference radio cards toggle
+  routeRadios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const isCustomer = radio.value === "customer";
+      if (customRouteWrap) customRouteWrap.hidden = !isCustomer;
+      if (cardFasttrack) cardFasttrack.classList.toggle("active", !isCustomer);
+      if (cardCustomer) cardCustomer.classList.toggle("active", isCustomer);
+    });
+  });
+
+  // Preset location chips for Pickup and Delivery
+  document.querySelectorAll(".preset-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const targetId = chip.dataset.target;
+      const targetInput = document.getElementById(targetId);
+      if (targetInput) {
+        targetInput.value = chip.dataset.val;
+        targetInput.focus();
+      }
+    });
+  });
+
+  // Preset safe corridor chips for custom waypoints
+  document.querySelectorAll(".preset-chip-add").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      if (!customWaypointsInput) return;
+      const valToAdd = chip.dataset.val;
+      const existing = customWaypointsInput.value.trim();
+      if (!existing) {
+        customWaypointsInput.value = valToAdd;
+      } else if (!existing.includes(valToAdd)) {
+        customWaypointsInput.value = `${existing}\n${valToAdd}`;
+      }
+      customWaypointsInput.focus();
+    });
+  });
+
+  // Submit Checkout / Book Order Form -> POST /api/orders
+  if (checkoutForm) {
+    checkoutForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const customerName = document.getElementById("checkoutCustomerName")?.value.trim();
+      const customerPhone = document.getElementById("checkoutCustomerPhone")?.value.trim();
+      const customerEmail = document.getElementById("checkoutCustomerEmail")?.value.trim();
+      const pickupAddress = document.getElementById("checkoutPickupAddress")?.value.trim();
+      const deliveryAddress = document.getElementById("checkoutDeliveryAddress")?.value.trim();
+      const priority = document.getElementById("checkoutPriority")?.value || "medium";
+      const orderValue = parseFloat(document.getElementById("checkoutOrderValue")?.value) || 0;
+      const selectedRoute = document.querySelector('input[name="routePreference"]:checked')?.value || "fasttrack";
+      const customWaypoints = customWaypointsInput?.value.trim() || "";
+
+      if (selectedRoute === "customer" && !customWaypoints) {
+        showToast("Safe Checkpoint Required", "Please enter at least one verified via-point or highway corridor.");
+        customWaypointsInput?.focus();
+        return;
+      }
+
+      const submitBtn = document.getElementById("btnSubmitCheckout");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>Booking Delivery...</span>`;
+      }
+
+      showToast("Booking Consignment", `Registering parcel drop from ${pickupAddress.split(",")[0]} to ${deliveryAddress.split(",")[0]}...`);
+
+      const result = await fetchApi("/api/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          customerName,
+          customerPhone,
+          customerEmail,
+          pickupAddress,
+          deliveryAddress,
+          priority,
+          orderValue,
+          routePreference: selectedRoute,
+          customWaypoints
+        })
+      });
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Confirm &amp; Book Consignment</span><span class="btn-arrow">→</span>`;
+      }
+
+      if (result && result.success) {
+        hideCheckoutModal();
+        checkoutForm.reset();
+        // Reset route choice back to fasttrack default
+        if (customRouteWrap) customRouteWrap.hidden = true;
+        if (cardFasttrack) cardFasttrack.classList.add("active");
+        if (cardCustomer) cardCustomer.classList.remove("active");
+
+        const order = result.data;
+        const driverMsg = result.driverAssigned
+          ? `Assigned to Driver ID #${order.assignedDriver}`
+          : `Queued for next available van`;
+
+        showToast(
+          "Consignment Booked! 🚀",
+          `Order #${order.id} (${order.customerName}) created successfully. ${driverMsg}. Route: ${order.routePreference === 'customer' ? 'Customer Safe Lock' : 'FastTrack AI'}`
+        );
+
+        // Instant refresh of live dashboard telemetry and charts
+        await loadLiveApiData();
+        await loadOrdersData();
+      } else {
+        const errorMsg = result?.message || "Failed to book consignment. Check server connectivity.";
+        showToast("Booking Failed", errorMsg);
+      }
+    });
+  }
+
+  // ==========================================================================
+  // Orders View & Tracking Modal Event Listeners
+  // ==========================================================================
+  const btnRefreshOrders = document.getElementById("btn-refresh-orders");
+  if (btnRefreshOrders) {
+    btnRefreshOrders.addEventListener("click", async () => {
+      showToast("Orders Synced", "Refreshing live consignment streams from backend...");
+      await loadOrdersData();
+    });
+  }
+
+  // Filter Pills (All, Pending, In Transit, Completed)
+  document.querySelectorAll("#ordersFilterGroup .filter-pill").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      document.querySelectorAll("#ordersFilterGroup .filter-pill").forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
+      ordersActiveFilter = pill.dataset.filter;
+      renderOrdersTable();
+    });
+  });
+
+  // Search input
+  const searchInput = document.getElementById("ordersSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      renderOrdersTable();
+    });
+  }
+
+  // Track Order Modal Close Triggers
+  const trackModal = document.getElementById("trackOrderModal");
+  const closeTrackBtn = document.getElementById("closeTrackModal");
+  const closeTrackBtn2 = document.getElementById("closeTrackModalBtn");
+
+  if (closeTrackBtn && trackModal) {
+    closeTrackBtn.addEventListener("click", () => (trackModal.hidden = true));
+  }
+  if (closeTrackBtn2 && trackModal) {
+    closeTrackBtn2.addEventListener("click", () => (trackModal.hidden = true));
+  }
+  if (trackModal) {
+    trackModal.addEventListener("click", (e) => {
+      if (e.target === trackModal) trackModal.hidden = true;
+    });
+  }
+
+  // Quick Consignment Radar Tool Handlers
+  const btnRunTrackLookup = document.getElementById("btnRunTrackLookup");
+  if (btnRunTrackLookup) {
+    btnRunTrackLookup.addEventListener("click", () => {
+      const id = parseInt(document.getElementById("trackLookupId")?.value);
+      if (!id) {
+        showToast("Order ID Required", "Please specify an order ID to trace.");
+        return;
+      }
+      openTrackOrderModal(id);
+    });
+  }
+
+  const btnRunAiPrediction = document.getElementById("btnRunAiPrediction");
+  if (btnRunAiPrediction) {
+    btnRunAiPrediction.addEventListener("click", async () => {
+      const id = parseInt(document.getElementById("trackLookupId")?.value);
+      if (!id) {
+        showToast("Order ID Required", "Please specify an order ID for AI prediction.");
+        return;
+      }
+
+      showToast("Running AI Predictor...", `Analyzing rush hour congestion and SLA promise for Order #${id}`);
+      const res = await fetchApi(`/api/ai/predict/${id}`);
+      const box = document.getElementById("quickTrackResult");
+      if (box && res?.prediction) {
+        const p = res.prediction;
+        box.hidden = false;
+        box.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <strong style="color: var(--neon-cyan); font-size: 0.85rem;">🤖 Machine Learning Delivery Window: Consignment #${id}</strong>
+            <span class="ai-confidence-pill">${p.confidence} Confidence</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 8px; font-size: 0.78rem;">
+            <div><span style="color: var(--text-secondary);">Customer:</span> <b>${escapeHtml(p.customerName)}</b></div>
+            <div><span style="color: var(--text-secondary);">Estimated SLA Window:</span> <b style="color: var(--neon-mint);">${p.estimatedDeliveryTime}</b></div>
+            <div><span style="color: var(--text-secondary);">Traffic Impact:</span> <b>${p.riskFactors?.length ? `⚠️ ${p.riskFactors[0]}` : '✓ Clear Corridors'}</b></div>
+          </div>
+        `;
+      } else {
+        showToast("Order Not Found", `Consignment #${id} was not found.`);
+      }
+    });
+  }
+
+  const btnSendCustomerSms = document.getElementById("btnSendCustomerSms");
+  if (btnSendCustomerSms) {
+    btnSendCustomerSms.addEventListener("click", () => {
+      const id = parseInt(document.getElementById("trackLookupId")?.value);
+      if (!id) {
+        showToast("Order ID Required", "Please specify an order ID to notify.");
+        return;
+      }
+      notifyOrderDirect(id);
+    });
   }
 
   // Assign Driver Modal Open/Close
@@ -954,7 +1801,260 @@ function initInteractions() {
       }, 1200);
     });
   }
+
+  // ==========================================================================
+  // Emergency SOS & Police Mesh Modal Triggers & Controls
+  // ==========================================================================
+  const emergencyModal = document.getElementById("emergencyModal");
+  const openSosBtns = [
+    document.getElementById("btn-open-sos-top"),
+    document.getElementById("btn-open-sos-dash"),
+    document.getElementById("tool-sos-radar"),
+    document.getElementById("btn-open-sos-home")
+  ];
+  const closeSosBtn = document.getElementById("closeEmergencyModal");
+  const closeSosBtn2 = document.getElementById("closeEmergencyModalBtn");
+  const locSelect = document.getElementById("emergencyLocationSelect");
+  const customWrap = document.getElementById("customCoordsWrap");
+  const latInp = document.getElementById("emergencyCustomLat");
+  const lngInp = document.getElementById("emergencyCustomLng");
+  const btnBroadcastSos = document.getElementById("btnBroadcastSos");
+
+  openSosBtns.forEach(btn => {
+    if (btn) {
+      btn.addEventListener("click", () => {
+        openEmergencyModal();
+      });
+    }
+  });
+
+  const hideSosModal = () => {
+    if (emergencyModal) emergencyModal.hidden = true;
+  };
+  if (closeSosBtn) closeSosBtn.addEventListener("click", hideSosModal);
+  if (closeSosBtn2) closeSosBtn2.addEventListener("click", hideSosModal);
+  if (emergencyModal) {
+    emergencyModal.addEventListener("click", (e) => {
+      if (e.target === emergencyModal) hideSosModal();
+    });
+  }
+
+  // Location selector change
+  if (locSelect) {
+    locSelect.addEventListener("change", async () => {
+      if (locSelect.value === "custom") {
+        if (customWrap) customWrap.hidden = false;
+        const lat = parseFloat(latInp?.value) || 28.6250;
+        const lng = parseFloat(lngInp?.value) || 77.2400;
+        currentEmergencyCoords = { lat, lng };
+        await fetchNearestPoliceStations(lat, lng);
+      } else {
+        if (customWrap) customWrap.hidden = true;
+        const [latStr, lngStr] = locSelect.value.split(",");
+        const lat = parseFloat(latStr);
+        const lng = parseFloat(lngStr);
+        currentEmergencyCoords = { lat, lng };
+        await fetchNearestPoliceStations(lat, lng);
+      }
+    });
+  }
+
+  if (latInp && lngInp) {
+    const onCustomCoordChange = async () => {
+      const lat = parseFloat(latInp.value) || 28.6250;
+      const lng = parseFloat(lngInp.value) || 77.2400;
+      currentEmergencyCoords = { lat, lng };
+      await fetchNearestPoliceStations(lat, lng);
+    };
+    latInp.addEventListener("change", onCustomCoordChange);
+    lngInp.addEventListener("change", onCustomCoordChange);
+  }
+
+  if (btnBroadcastSos) {
+    btnBroadcastSos.addEventListener("click", broadcastEmergencySos);
+  }
+
+  // ==========================================================================
+  // Operator Profile Modal (Admin Pill Trigger)
+  // ==========================================================================
+  const userProfileBtn = document.getElementById("user-profile-btn");
+  const operatorModal = document.getElementById("operatorProfileModal");
+  const closeOperatorBtn = document.getElementById("closeOperatorModal");
+  const closeOperatorBtn2 = document.getElementById("closeOperatorModalBtn");
+  const btnExportSessionLog = document.getElementById("btnExportSessionLog");
+
+  if (userProfileBtn && operatorModal) {
+    userProfileBtn.addEventListener("click", () => {
+      operatorModal.hidden = false;
+    });
+  }
+
+  const hideOperatorModal = () => {
+    if (operatorModal) operatorModal.hidden = true;
+  };
+  if (closeOperatorBtn) closeOperatorBtn.addEventListener("click", hideOperatorModal);
+  if (closeOperatorBtn2) closeOperatorBtn2.addEventListener("click", hideOperatorModal);
+  if (operatorModal) {
+    operatorModal.addEventListener("click", (e) => {
+      if (e.target === operatorModal) hideOperatorModal();
+    });
+  }
+
+  if (btnExportSessionLog) {
+    btnExportSessionLog.addEventListener("click", () => {
+      const shiftLog = {
+        operator: "Alex Chen",
+        role: "Senior Operations Dispatcher",
+        terminal: "TERM-DEL-01A",
+        sector: "Delhi NCR Core",
+        sessionStart: new Date(Date.now() - 4.4 * 3600000).toISOString(),
+        activeShiftTime: "4h 24m",
+        dispatchesAuthorized: currentOrdersList.length,
+        fleetSupervised: 48,
+        slaScore: "98.5%",
+        securityClearance: "Level 4",
+        exportTimestamp: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(shiftLog, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `shift_log_AlexChen_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Shift Log Exported", "Operator audit trail JSON downloaded.");
+    });
+  }
+
+  // ==========================================================================
+  // Card Context Menu Dropdowns (Dots Buttons)
+  // ==========================================================================
+  const contextMenu = document.getElementById("cardContextMenu");
+
+  document.querySelectorAll(".card-dots-btn, .more-options-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!contextMenu) return;
+
+      const rect = btn.getBoundingClientRect();
+      contextMenu.style.top = `${rect.bottom + window.scrollY + 6}px`;
+      contextMenu.style.left = `${Math.min(rect.left + window.scrollX - 140, window.innerWidth - 240)}px`;
+      contextMenu.hidden = false;
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (contextMenu && !contextMenu.contains(e.target)) {
+      contextMenu.hidden = true;
+    }
+  });
+
+  if (contextMenu) {
+    contextMenu.querySelectorAll(".context-menu-item").forEach((item) => {
+      item.addEventListener("click", async () => {
+        const action = item.dataset.action;
+        contextMenu.hidden = true;
+
+        if (action === "refresh") {
+          showToast("Syncing Telemetry", "Querying backend for live GPS & order telemetry...");
+          await loadLiveApiData();
+          showToast("Telemetry Refreshed", "All dashboard telemetry cards synced.");
+        } else if (action === "export") {
+          const snapshot = {
+            timestamp: new Date().toISOString(),
+            operator: "Alex Chen",
+            ordersCount: currentOrdersList.length,
+            orders: currentOrdersList,
+            fleetMetrics: {
+              activeVans: "48/50",
+              onTimeRate: "98.5%",
+              aiFuelSavings: "24.8%"
+            }
+          };
+          const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `bharat_express_telemetry_${Date.now()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast("Snapshot Exported", "Live telemetry metrics downloaded.");
+        } else if (action === "settings") {
+          switchSection("settings");
+        }
+      });
+    });
+  }
 }
+
+/* ==========================================================================
+   SETTINGS PERSISTENCE (localStorage)
+   ========================================================================== */
+
+const SETTINGS_STORAGE_KEY = "bharat_express_ops_settings_v1";
+
+function loadSettingsFromStorage() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!raw) {
+      saveSettingsToStorage();
+      return;
+    }
+    const s = JSON.parse(raw);
+
+    const autoOpt = document.getElementById("setting-auto-optimize");
+    if (autoOpt && s.autoOptimize !== undefined) autoOpt.checked = s.autoOptimize;
+
+    const maxOrders = document.getElementById("setting-max-orders");
+    if (maxOrders && s.maxOrders !== undefined) maxOrders.value = s.maxOrders;
+
+    const minRating = document.getElementById("setting-min-rating");
+    if (minRating && s.minRating !== undefined) minRating.value = s.minRating;
+
+    const speedAlert = document.getElementById("setting-speed-alert");
+    if (speedAlert && s.speedAlert !== undefined) speedAlert.value = s.speedAlert;
+
+    const autoPolice = document.getElementById("setting-auto-police");
+    if (autoPolice && s.autoPolice !== undefined) autoPolice.checked = s.autoPolice;
+
+    const custPriority = document.getElementById("setting-customer-priority");
+    if (custPriority && s.customerPriority !== undefined) custPriority.checked = s.customerPriority;
+  } catch (e) {
+    console.warn("Could not load settings from localStorage:", e);
+  }
+}
+
+function saveSettingsToStorage() {
+  const autoOpt = document.getElementById("setting-auto-optimize")?.checked ?? true;
+  const maxOrders = parseInt(document.getElementById("setting-max-orders")?.value) || 6;
+  const minRating = parseFloat(document.getElementById("setting-min-rating")?.value) || 4.8;
+  const speedAlert = parseInt(document.getElementById("setting-speed-alert")?.value) || 65;
+  const autoPolice = document.getElementById("setting-auto-police")?.checked ?? true;
+  const customerPriority = document.getElementById("setting-customer-priority")?.checked ?? true;
+
+  const settingsObj = {
+    autoOptimize: autoOpt,
+    maxOrders,
+    minRating,
+    speedAlert,
+    autoPolice,
+    customerPriority,
+    savedAt: new Date().toISOString()
+  };
+
+  try {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settingsObj));
+    showToast(
+      "Settings Persisted ✓",
+      `Max ${maxOrders} orders/van · Speed alert at ${speedAlert} km/h · Auto-Police: ${autoPolice ? 'ON' : 'OFF'}`
+    );
+  } catch (e) {
+    showToast("Settings Saved", "Preferences applied to active session.");
+  }
+}
+
+window.loadSettingsFromStorage = loadSettingsFromStorage;
+window.saveSettingsToStorage = saveSettingsToStorage;
 
 /**
  * Real Backend AI Route Optimization
@@ -1051,3 +2151,95 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+/* ==========================================================================
+   6. 1-CLICK FLOATING HUD CARD TOGGLE (MINIMIZE / EXPAND)
+   ========================================================================== */
+
+function initCardCollapses() {
+  const toggleActiveMap = document.getElementById("btn-toggle-active-map");
+  const panelActiveMap = document.getElementById("active-map-panel");
+  if (toggleActiveMap && panelActiveMap) {
+    toggleActiveMap.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isCollapsed = panelActiveMap.classList.toggle("collapsed");
+      const icon = toggleActiveMap.querySelector(".toggle-icon");
+      if (icon) icon.textContent = isCollapsed ? "+" : "−";
+      toggleActiveMap.title = isCollapsed ? "Expand Panel (1-Click)" : "Minimize Panel (1-Click)";
+    });
+  }
+
+  const toggleAiOpt = document.getElementById("btn-toggle-ai-opt");
+  const panelAiOpt = document.getElementById("ai-route-optimization-panel");
+  if (toggleAiOpt && panelAiOpt) {
+    toggleAiOpt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isCollapsed = panelAiOpt.classList.toggle("collapsed");
+      const icon = toggleAiOpt.querySelector(".toggle-icon");
+      if (icon) icon.textContent = isCollapsed ? "+" : "−";
+      toggleAiOpt.title = isCollapsed ? "Expand Panel (1-Click)" : "Minimize Panel (1-Click)";
+    });
+  }
+
+  // On mobile devices, default floating cards to collapsed for maximum map space
+  if (window.innerWidth <= 768) {
+    if (panelActiveMap) {
+      panelActiveMap.classList.add("collapsed");
+      const icon = toggleActiveMap ? toggleActiveMap.querySelector(".toggle-icon") : null;
+      if (icon) icon.textContent = "+";
+    }
+    if (panelAiOpt) {
+      panelAiOpt.classList.add("collapsed");
+      const icon = toggleAiOpt ? toggleAiOpt.querySelector(".toggle-icon") : null;
+      if (icon) icon.textContent = "+";
+    }
+  }
+}
+
+/* ==========================================================================
+   7. MOBILE-FIRST INTERACTION CONTROLLER (BOTTOM NAV & TELEMETRY SHEET)
+   ========================================================================== */
+
+function initMobileNavigation() {
+  const rightPanel = document.getElementById("dashboardRightPanel");
+  const btnStatsFab = document.getElementById("btn-mobile-stats-fab");
+  const btnBackMap = document.getElementById("btn-mobile-back-map");
+  const mobileNavBtns = document.querySelectorAll(".mobile-nav-btn");
+
+  function setMobileSub(sub) {
+    if (sub === "stats") {
+      if (rightPanel) rightPanel.classList.add("mobile-active");
+      mobileNavBtns.forEach(b => b.classList.toggle("active", b.dataset.sub === "stats"));
+    } else {
+      if (rightPanel) rightPanel.classList.remove("mobile-active");
+      mobileNavBtns.forEach(b => b.classList.toggle("active", b.dataset.sub === "map"));
+      if (map) {
+        setTimeout(() => map.invalidateSize(), 150);
+      }
+    }
+  }
+
+  if (btnStatsFab) {
+    btnStatsFab.addEventListener("click", () => setMobileSub("stats"));
+  }
+
+  if (btnBackMap) {
+    btnBackMap.addEventListener("click", () => setMobileSub("map"));
+  }
+
+  mobileNavBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.tab;
+      const sub = btn.dataset.sub;
+      switchSection(tab);
+      if (tab === "dashboard" && sub) {
+        setMobileSub(sub);
+      } else {
+        if (rightPanel) rightPanel.classList.remove("mobile-active");
+        mobileNavBtns.forEach(b => b.classList.toggle("active", b === btn));
+      }
+    });
+  });
+}
+
+

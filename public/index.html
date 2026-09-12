@@ -29,10 +29,14 @@
         </span>
       </a>
 
-      <!-- Date & Time Display -->
-      <div class="datetime-pill">
-        <div class="time-text" id="live-time">10:45 AM</div>
-        <div class="date-text" id="live-date">14 OCT 2023</div>
+      <!-- Date & Time Display (Ultra-Clean Status Badge) -->
+      <div class="datetime-pill" title="Live System Telematics (IST)">
+        <span class="live-dot-pulse"></span>
+        <div class="datetime-text-wrap">
+          <span class="time-text" id="live-time">10:45 AM</span>
+          <span class="datetime-sep">·</span>
+          <span class="date-text" id="live-date">14 OCT 2026</span>
+        </div>
       </div>
     </div>
 
@@ -54,6 +58,15 @@
           <rect x="11" y="11" width="6" height="6" rx="1.5"/>
         </svg>
         <span>Dashboard</span>
+      </button>
+
+      <button class="nav-tab" data-tab="orders">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 6L10 2L17 6V14L10 18L3 14V6Z"/>
+          <path d="M3 6L10 10L17 6"/>
+          <path d="M10 10V18"/>
+        </svg>
+        <span>Orders</span>
       </button>
 
       <button class="nav-tab" data-tab="maps">
@@ -102,8 +115,18 @@
       </button>
     </nav>
 
-    <!-- Admin User Profile -->
+    <!-- Action Button + Admin User Profile -->
     <div class="nav-right">
+      <button class="btn-sos-trigger" id="btn-open-sos-top" title="Emergency SOS Police Mesh (112 Protocol)">
+        <span class="sos-icon-pulse">🚨</span>
+        <span>SOS Police</span>
+      </button>
+
+      <button class="btn-book-checkout" id="btn-open-checkout-top">
+        <span class="btn-plus-icon">+</span>
+        <span>Book Delivery</span>
+      </button>
+
       <div class="user-pill" id="user-profile-btn">
         <div class="avatar-circle">
           <svg viewBox="0 0 20 20" fill="currentColor">
@@ -133,6 +156,14 @@
             <rect x="14" y="3" width="7" height="7" rx="1.5"/>
             <rect x="3" y="14" width="7" height="7" rx="1.5"/>
             <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+        </button>
+
+        <button class="rail-btn" title="Orders - Consignments & Tracking" data-tab="orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
           </svg>
         </button>
 
@@ -240,41 +271,52 @@
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
               </svg>
             </button>
+            <button class="map-tool-btn tool-sos" id="tool-sos-radar" title="Emergency SOS Police Mesh (112)">
+              🚨
+            </button>
           </div>
 
           <!-- Floating Glass Card: Active Map Routes (Top-Left) -->
           <aside class="floating-card top-left-card glass-panel" id="active-map-panel">
             <div class="card-header-compact">
-              <h3 class="compact-title">Active: Map</h3>
+              <div class="card-header-title-wrap">
+                <span class="card-pulse-icon">🗺️</span>
+                <h3 class="compact-title">Active: Map</h3>
+              </div>
+              <button class="card-toggle-btn" id="btn-toggle-active-map" title="Minimize/Expand (1-Click)">
+                <span class="toggle-icon">−</span>
+              </button>
             </div>
-            <div class="routes-track-list">
-              <div class="route-track-item" data-route="FT-409">
-                <div class="track-row">
-                  <span class="track-name">Route FT-409</span>
-                  <span class="badge-status badge-active">Active</span>
+            <div class="card-collapsible-content">
+              <div class="routes-track-list">
+                <div class="route-track-item" data-route="FT-409">
+                  <div class="track-row">
+                    <span class="track-name">Route FT-409</span>
+                    <span class="badge-status badge-active">Active</span>
+                  </div>
+                  <div class="track-bar bar-cyan">
+                    <div class="bar-fill" style="width: 78%;"></div>
+                  </div>
                 </div>
-                <div class="track-bar bar-cyan">
-                  <div class="bar-fill" style="width: 78%;"></div>
-                </div>
-              </div>
 
-              <div class="route-track-item" data-route="FT-312">
-                <div class="track-row">
-                  <span class="track-name">Route FT-312</span>
-                  <span class="badge-status badge-active">Active</span>
+                <div class="route-track-item" data-route="FT-312">
+                  <div class="track-row">
+                    <span class="track-name">Route FT-312</span>
+                    <span class="badge-status badge-active">Active</span>
+                  </div>
+                  <div class="track-bar bar-green">
+                    <div class="bar-fill" style="width: 62%;"></div>
+                  </div>
                 </div>
-                <div class="track-bar bar-green">
-                  <div class="bar-fill" style="width: 62%;"></div>
-                </div>
-              </div>
 
-              <div class="route-track-item" data-route="FT-550">
-                <div class="track-row">
-                  <span class="track-name">Route FT-550</span>
-                  <span class="badge-status badge-pending">Pending</span>
-                </div>
-                <div class="track-bar bar-teal">
-                  <div class="bar-fill" style="width: 35%;"></div>
+                <div class="route-track-item" data-route="FT-550">
+                  <div class="track-row">
+                    <span class="track-name">Route FT-550</span>
+                    <span class="badge-status badge-pending">Pending</span>
+                  </div>
+                  <div class="track-bar bar-teal">
+                    <div class="bar-fill" style="width: 35%;"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -283,32 +325,42 @@
           <!-- Floating Glass Card: AI Route Optimization (Bottom-Left) -->
           <aside class="floating-card bottom-left-card glass-panel" id="ai-route-optimization-panel">
             <div class="card-header-between">
-              <h3 class="compact-title">AI Route Optimization</h3>
-              <button class="more-options-btn" title="Options">•••</button>
-            </div>
-
-            <!-- Legend and Savings badge -->
-            <div class="ai-opt-legend">
-              <div class="legend-item">
-                <span class="legend-line line-gray"></span>
-                <span class="legend-label">Traditional Routing</span>
+              <div class="card-header-title-wrap">
+                <span class="card-pulse-icon">⚡</span>
+                <h3 class="compact-title">AI Route Optimization</h3>
               </div>
-              <div class="legend-item">
-                <span class="legend-line line-cyan"></span>
-                <span class="legend-label">Bharat Express AI</span>
-              </div>
-              <div class="savings-pill">
-                <span>Optimized Savings: <strong id="savings-val">18%</strong></span>
+              <div class="card-header-actions">
+                <button class="card-toggle-btn" id="btn-toggle-ai-opt" title="Minimize/Expand (1-Click)">
+                  <span class="toggle-icon">−</span>
+                </button>
+                <button class="more-options-btn" title="Options">•••</button>
               </div>
             </div>
 
-            <!-- Smooth Dual Bezier Graph Canvas -->
-            <div class="chart-container">
-              <div class="y-axis-label">Delivery Time (hrs)</div>
-              <div class="chart-canvas-wrap">
-                <canvas id="optimizationChart" width="340" height="150"></canvas>
+            <div class="card-collapsible-content">
+              <!-- Legend and Savings badge -->
+              <div class="ai-opt-legend">
+                <div class="legend-item">
+                  <span class="legend-line line-gray"></span>
+                  <span class="legend-label">Traditional</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-line line-cyan"></span>
+                  <span class="legend-label">AI Routed</span>
+                </div>
+                <div class="savings-pill">
+                  <span>Savings: <strong id="savings-val">18%</strong></span>
+                </div>
               </div>
-              <div class="x-axis-label">Cost ($)</div>
+
+              <!-- Smooth Dual Bezier Graph Canvas -->
+              <div class="chart-container">
+                <div class="y-axis-label">Delivery Time (hrs)</div>
+                <div class="chart-canvas-wrap">
+                  <canvas id="optimizationChart" width="340" height="135"></canvas>
+                </div>
+                <div class="x-axis-label">Cost ($)</div>
+              </div>
             </div>
           </aside>
 
@@ -318,6 +370,12 @@
             <button class="zoom-btn" id="zoom-out" title="Zoom out">−</button>
           </div>
 
+          <!-- Mobile Floating Action Button: Open Telemetry & Drivers -->
+          <button class="mobile-telemetry-fab" id="btn-mobile-stats-fab" title="View Telemetry & Drivers">
+            <span class="fab-icon">📊</span>
+            <span class="fab-label">Live Ops & Drivers</span>
+          </button>
+
           <!-- Map Attribution -->
           <div class="map-osm-attr">
             <span>Map data © <a href="https://www.esri.com" target="_blank" rel="noopener">ESRI</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></span>
@@ -325,7 +383,15 @@
         </main>
 
         <!-- Right Sidebar Dashboard Panels -->
-        <aside class="right-panel">
+        <aside class="right-panel" id="dashboardRightPanel">
+          <!-- Mobile Return to Map Button (Visible only on mobile) -->
+          <div class="mobile-panel-header">
+            <button class="mobile-back-to-map-btn" id="btn-mobile-back-map" type="button">
+              <span>← Return to Live Map</span>
+            </button>
+            <span class="mobile-panel-title">Operations Metrics</span>
+          </div>
+
           <!-- 1. Telemetry Stats (Real-Time) -->
           <section class="glass-card telemetry-card">
             <div class="card-head-row">
@@ -481,12 +547,144 @@
 
             <!-- Driver Assignment Action Buttons -->
             <div class="driver-actions-row">
-              <button class="btn-subtle" id="btn-assign-modal">Assign New Driver</button>
+              <button class="btn-saffron-action" id="btn-open-checkout-dash">+ Book Consignment</button>
+              <button class="btn-subtle" id="btn-assign-modal">Assign Driver</button>
               <button class="btn-subtle" id="btn-live-chat">Live Chat</button>
+              <button class="btn-subtle btn-sos-dash" id="btn-open-sos-dash" title="Emergency Police Radar (112)">🚨 SOS Police</button>
               <button class="btn-optimize-glow" id="btn-optimize-now">Optimize Now</button>
             </div>
           </section>
         </aside>
+      </div>
+
+      <!-- ===================================================================
+           VIEW: ORDERS (Consignments, Dispatch & Live Tracking)
+           =================================================================== -->
+      <div class="section-view" id="view-orders">
+        <div class="content-scroll-container">
+          <div class="view-header-strip">
+            <div>
+              <h2>📦 Consignment Roster &amp; Live Tracking Control</h2>
+              <p>Manage pending consignments, dispatch riders on AI or safety routes, and track doorstep deliveries in real time.</p>
+            </div>
+            <div class="header-action-group">
+              <button class="btn-saffron-action" id="btn-open-checkout-orders">+ New Consignment</button>
+              <button class="btn-subtle" id="btn-refresh-orders">Refresh Orders</button>
+            </div>
+          </div>
+
+          <!-- Orders KPI Summary Grid -->
+          <div class="orders-kpi-row">
+            <div class="orders-kpi-card">
+              <div class="kpi-icon-badge badge-amber">⏳</div>
+              <div>
+                <span class="kpi-metric-val" id="orders-pending-count">0</span>
+                <span class="kpi-metric-lbl">Pending Dispatch</span>
+              </div>
+            </div>
+
+            <div class="orders-kpi-card">
+              <div class="kpi-icon-badge badge-cyan">🚚</div>
+              <div>
+                <span class="kpi-metric-val" id="orders-transit-count">0</span>
+                <span class="kpi-metric-lbl">Out for Delivery</span>
+              </div>
+            </div>
+
+            <div class="orders-kpi-card">
+              <div class="kpi-icon-badge badge-green">✓</div>
+              <div>
+                <span class="kpi-metric-val" id="orders-completed-count">0</span>
+                <span class="kpi-metric-lbl">Completed Drops</span>
+              </div>
+            </div>
+
+            <div class="orders-kpi-card">
+              <div class="kpi-icon-badge badge-saffron">₹</div>
+              <div>
+                <span class="kpi-metric-val" id="orders-total-val">₹0</span>
+                <span class="kpi-metric-lbl">Total Consignment Value</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Track Bar & Filter Strip -->
+          <div class="orders-toolbar-strip">
+            <div class="orders-search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="ordersSearchInput" placeholder="Filter by customer name, address, or Order ID...">
+            </div>
+
+            <div class="orders-status-filters" id="ordersFilterGroup">
+              <button class="filter-pill active" data-filter="all">All Orders</button>
+              <button class="filter-pill" data-filter="pending">Pending</button>
+              <button class="filter-pill" data-filter="out-for-delivery">In Transit</button>
+              <button class="filter-pill" data-filter="completed">Completed</button>
+            </div>
+          </div>
+
+          <!-- Real Orders Table -->
+          <div class="glass-card table-section">
+            <div class="table-card-head">
+              <h3 class="card-heading">Active Consignments Stream</h3>
+              <span class="table-count-badge" id="orders-table-count">Loading orders...</span>
+            </div>
+
+            <div class="drivers-table-wrapper">
+              <table class="orders-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer &amp; Contact</th>
+                    <th>Pickup &amp; Delivery Route</th>
+                    <th>Priority</th>
+                    <th>Declared Value</th>
+                    <th>Route Policy</th>
+                    <th>Driver Assigned</th>
+                    <th>Lifecycle Status</th>
+                    <th>Operations</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <!-- Dynamically populated by renderOrdersTable() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Quick Track Order Tool Card -->
+          <div class="track-lookup-card glass-card">
+            <div class="lookup-header">
+              <div class="lookup-title-group">
+                <span class="lookup-icon">📡</span>
+                <div>
+                  <h3>Direct Consignment Radar &amp; AI Diagnostic</h3>
+                  <p>Enter any consignment ID to fetch real-time telemetry, driver location, and machine learning SLA risk predictions.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lookup-input-row">
+              <div class="lookup-input-wrap">
+                <label for="trackLookupId">Consignment ID:</label>
+                <input type="number" id="trackLookupId" min="1" placeholder="e.g. 1, 2, 3..." value="1">
+              </div>
+              <button class="btn-optimize-glow" id="btnRunTrackLookup">
+                <span>Track on Radar</span>
+              </button>
+              <button class="btn-subtle" id="btnRunAiPrediction">
+                <span>Run AI Predictor</span>
+              </button>
+              <button class="btn-subtle" id="btnSendCustomerSms">
+                <span>Send SMS Alert</span>
+              </button>
+            </div>
+
+            <div id="quickTrackResult" class="quick-track-result" hidden>
+              <!-- Populated when user clicks Track/Predict/Notify -->
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ===================================================================
@@ -553,7 +751,10 @@
                 <div class="pillar-icon">🚨</div>
                 <h3>4. Instant SOS Police Mesh</h3>
                 <p>In case of emergencies, accidents, or transit delays, our integrated police locator uses real-time telemetry to route couriers to the nearest verified station (112 Emergency protocol) with one click.</p>
-                <div class="pillar-tag">Direct 112 / 100 Sync</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; gap: 6px;">
+                  <span class="pillar-tag">Direct 112 / 100 Sync</span>
+                  <button type="button" class="btn-sos-trigger btn-sm" id="btn-open-sos-home">Launch Police Mesh</button>
+                </div>
               </div>
             </div>
           </div>
@@ -882,7 +1083,7 @@
                   <strong>Automatic Route Optimization</strong>
                   <span>Automatically recalculate routes when traffic density spikes > 30%</span>
                 </div>
-                <input type="checkbox" checked class="setting-toggle">
+                <input type="checkbox" checked class="setting-toggle" id="setting-auto-optimize">
               </div>
 
               <div class="setting-row">
@@ -890,7 +1091,7 @@
                   <strong>Max Orders Per Delivery Van</strong>
                   <span>Limit number of drop-offs assigned to single courier run</span>
                 </div>
-                <input type="number" value="6" min="1" max="15" class="setting-input-small">
+                <input type="number" value="6" min="1" max="15" class="setting-input-small" id="setting-max-orders">
               </div>
 
               <div class="setting-row">
@@ -898,7 +1099,7 @@
                   <strong>Minimum Driver Rating for High-Priority Orders</strong>
                   <span>Only drivers with this rating will receive high-value consignments</span>
                 </div>
-                <input type="number" value="4.8" step="0.1" min="4.0" max="5.0" class="setting-input-small">
+                <input type="number" value="4.8" step="0.1" min="4.0" max="5.0" class="setting-input-small" id="setting-min-rating">
               </div>
             </div>
 
@@ -910,7 +1111,9 @@
                   <strong>Speed Governor Alert</strong>
                   <span>Trigger audible beep in courier device when exceeding threshold</span>
                 </div>
-                <input type="number" value="65" min="30" max="90" class="setting-input-small"> km/h
+                <div>
+                  <input type="number" value="65" min="30" max="90" class="setting-input-small" id="setting-speed-alert"> km/h
+                </div>
               </div>
 
               <div class="setting-row">
@@ -918,7 +1121,7 @@
                   <strong>Emergency Police Auto-Triangulation</strong>
                   <span>Automatically cache nearest police station along every assigned route</span>
                 </div>
-                <input type="checkbox" checked class="setting-toggle">
+                <input type="checkbox" checked class="setting-toggle" id="setting-auto-police">
               </div>
 
               <div class="setting-row">
@@ -926,7 +1129,7 @@
                   <strong>Customer Safe-Route Priority</strong>
                   <span>Always honor customer safety via-points over shortest algorithmic path</span>
                 </div>
-                <input type="checkbox" checked class="setting-toggle">
+                <input type="checkbox" checked class="setting-toggle" id="setting-customer-priority">
               </div>
             </div>
           </div>
@@ -939,6 +1142,305 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Interactive Book Delivery / Consignment Checkout Modal -->
+  <div class="modal-backdrop" id="checkoutModal" hidden>
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge">📦</div>
+          <div>
+            <h3>Book Consignment &amp; Delivery Checkout</h3>
+            <p class="modal-subtitle">Dispatch parcels into Bharat Express routing mesh with AI &amp; customer safety locks</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeCheckoutModal" aria-label="Close Checkout Modal">&times;</button>
+      </div>
+
+      <form id="checkoutOrderForm">
+        <!-- Section 1: Customer Details -->
+        <div class="form-section-title">👤 Customer Information</div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label for="checkoutCustomerName">Customer Name <span class="req-star">*</span></label>
+            <input id="checkoutCustomerName" type="text" placeholder="e.g. Vikramaditya Sharma" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="checkoutCustomerPhone">Phone Number</label>
+            <input id="checkoutCustomerPhone" type="tel" placeholder="+91-98765-43210" autocomplete="tel">
+          </div>
+          <div class="form-group">
+            <label for="checkoutCustomerEmail">Email Address</label>
+            <input id="checkoutCustomerEmail" type="email" placeholder="customer@domain.in" autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Section 2: Addresses -->
+        <div class="form-section-title">📍 Dispatch Locations (Delhi NCR &amp; Corridors)</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="checkoutPickupAddress">Pickup Address <span class="req-star">*</span></label>
+            <input id="checkoutPickupAddress" type="text" placeholder="e.g. Shop 12, Connaught Place Inner Circle, New Delhi" required>
+            <div class="preset-chips">
+              <span class="chips-label">Hubs:</span>
+              <button type="button" class="preset-chip" data-target="checkoutPickupAddress" data-val="Connaught Place Inner Circle, New Delhi">Connaught Place</button>
+              <button type="button" class="preset-chip" data-target="checkoutPickupAddress" data-val="Karol Bagh Logistics Hub, New Delhi">Karol Bagh</button>
+              <button type="button" class="preset-chip" data-target="checkoutPickupAddress" data-val="Sector 62 Central HQ, Noida">Noida Sec 62</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="checkoutDeliveryAddress">Delivery Destination <span class="req-star">*</span></label>
+            <input id="checkoutDeliveryAddress" type="text" placeholder="e.g. B-42, Central Market, Lajpat Nagar, New Delhi" required>
+            <div class="preset-chips">
+              <span class="chips-label">Destinations:</span>
+              <button type="button" class="preset-chip" data-target="checkoutDeliveryAddress" data-val="Lajpat Nagar Central Market, New Delhi">Lajpat Nagar</button>
+              <button type="button" class="preset-chip" data-target="checkoutDeliveryAddress" data-val="DLF Cyber City Phase 2, Gurgaon">Gurgaon DLF</button>
+              <button type="button" class="preset-chip" data-target="checkoutDeliveryAddress" data-val="Okhla Industrial Area Phase 3, New Delhi">Okhla Ph 3</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Consignment Parameters -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="checkoutPriority">Delivery Priority SLA</label>
+            <select id="checkoutPriority">
+              <option value="medium" selected>Standard Priority (Target &lt; 45 mins)</option>
+              <option value="high">Express Urgent Priority (Target &lt; 25 mins)</option>
+              <option value="low">Economy Flex (Scheduled Batch Delivery)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="checkoutOrderValue">Consignment Value (₹)</label>
+            <input id="checkoutOrderValue" type="number" min="0" step="1" value="750" placeholder="750">
+          </div>
+        </div>
+
+        <!-- Section 4: Route Preference Choice Cards -->
+        <div class="form-section-title">🛡️ Route Optimization &amp; Safety Protocol</div>
+        <div class="route-choice-grid">
+          <label class="route-choice-card active" id="cardFasttrackRoute">
+            <input type="radio" name="routePreference" value="fasttrack" checked>
+            <div class="choice-content">
+              <div class="choice-head">
+                <span class="choice-title">⚡ FastTrack AI Dynamic Route</span>
+                <span class="choice-badge badge-cyan">AI Optimized</span>
+              </div>
+              <p class="choice-desc">Autonomous engine calculates the fastest, lowest fuel corridor using spatial micro-clustering and traffic heuristics.</p>
+            </div>
+          </label>
+
+          <label class="route-choice-card" id="cardCustomerRoute">
+            <input type="radio" name="routePreference" value="customer">
+            <div class="choice-content">
+              <div class="choice-head">
+                <span class="choice-title">🔒 Customer Safe-Path Lock</span>
+                <span class="choice-badge badge-saffron">Zero Divert</span>
+              </div>
+              <p class="choice-desc">Lock specific trusted via-points (main roads, highways). The driver's navigation enforces compliance with zero shortcuts.</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- Section 5: Custom Waypoints (Expandable) -->
+        <div class="custom-route-box" id="checkoutCustomRouteWrap" hidden>
+          <label for="checkoutCustomWaypoints">
+            <span>Mandatory Safe Via-Points (One checkpoint per line) <span class="req-star">*</span></span>
+            <span class="field-hint">Couriers must traverse each checkpoint before reaching the destination.</span>
+          </label>
+          <textarea id="checkoutCustomWaypoints" rows="2" placeholder="India Gate C-Hexagon, New Delhi&#10;AIIMS Flyover Ring Road, New Delhi"></textarea>
+          <div class="preset-chips">
+            <span class="chips-label">Quick Safe Corridors:</span>
+            <button type="button" class="preset-chip-add" data-val="India Gate C-Hexagon, New Delhi">+ India Gate</button>
+            <button type="button" class="preset-chip-add" data-val="AIIMS Flyover Ring Road, New Delhi">+ AIIMS Flyover</button>
+            <button type="button" class="preset-chip-add" data-val="DND Flyway Toll Plaza, Delhi-Noida">+ DND Flyway</button>
+            <button type="button" class="preset-chip-add" data-val="NH-48 Expressway Toll, Gurgaon">+ NH-48 Expressway</button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-subtle" id="cancelCheckoutBtn">Cancel</button>
+          <button type="submit" class="btn-optimize-glow" id="btnSubmitCheckout">
+            <span>Confirm &amp; Book Consignment</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Track Order & AI Prediction Modal -->
+  <div class="modal-backdrop" id="trackOrderModal" hidden>
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge" style="color: #00e5ff;">📡</div>
+          <div>
+            <h3 id="trackModalHeading">Consignment Tracking Radar</h3>
+            <p class="modal-subtitle" id="trackModalSubhead">Telemetry timeline &amp; turn-by-turn routing diagnostics</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeTrackModal" aria-label="Close Tracking Modal">&times;</button>
+      </div>
+
+      <div class="track-modal-body" id="trackModalBody">
+        <!-- Dynamically populated with timeline, driver profile, route details, and AI predictions -->
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-subtle" id="closeTrackModalBtn">Done</button>
+        <button type="button" class="btn-optimize-glow" id="modalNotifyBtn">Notify Customer via SMS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Emergency SOS & Police Mesh Modal -->
+  <div class="modal-backdrop" id="emergencyModal" hidden>
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header modal-header-emergency">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge badge-emergency-pulse">🚨</div>
+          <div>
+            <h3 id="emergencyModalHeading">National Emergency SOS &amp; Police Mesh</h3>
+            <p class="modal-subtitle">112 National Protocol · Real-Time Nearest Police Station Routing &amp; Escort</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeEmergencyModal" aria-label="Close Emergency Modal">&times;</button>
+      </div>
+
+      <div class="emergency-modal-body">
+        <!-- Emergency Dispatch Controls -->
+        <div class="emergency-controls-strip">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="emergencyLocationSelect">Incident Location / Courier Coordinates</label>
+              <select id="emergencyLocationSelect">
+                <option value="28.6250,77.2400" selected>Delhi NCR Central (28.6250° N, 77.2400° E)</option>
+                <option value="28.6315,77.2167">Connaught Place Hub (28.6315° N, 77.2167° E)</option>
+                <option value="28.5830,77.2800">DND Flyway Toll Plaza (28.5830° N, 77.2800° E)</option>
+                <option value="28.4595,77.0266">Gurgaon NH-48 Toll (28.4595° N, 77.0266° E)</option>
+                <option value="28.6280,77.3649">Noida Sector 62 HQ (28.6280° N, 77.3649° E)</option>
+                <option value="custom">Custom Coordinates (Enter Lat/Lng)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="emergencyTypeSelect">Nature of Incident</label>
+              <select id="emergencyTypeSelect">
+                <option value="threat" selected>🚨 Courier Security / Threat Incident</option>
+                <option value="accident">🚑 Road Accident / Medical Assistance</option>
+                <option value="breakdown">🛠️ Vehicle Breakdown in High-Risk Zone</option>
+                <option value="transit_delay">⚠️ Route Impasse / Severe Transit Delay</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2" id="customCoordsWrap" hidden>
+            <div class="form-group">
+              <label for="emergencyCustomLat">Latitude</label>
+              <input type="number" step="0.0001" id="emergencyCustomLat" value="28.6250">
+            </div>
+            <div class="form-group">
+              <label for="emergencyCustomLng">Longitude</label>
+              <input type="number" step="0.0001" id="emergencyCustomLng" value="77.2400">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="emergencyOrderId">Linked Consignment ID (Optional)</label>
+              <input type="number" id="emergencyOrderId" placeholder="e.g. 1, 2, 3..." min="1">
+            </div>
+            <div class="form-group">
+              <label for="emergencyDescription">Incident Remarks / Dispatch Notes</label>
+              <input type="text" id="emergencyDescription" placeholder="e.g. Courier halted near flyover, requiring police route escort">
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Police Mesh Locator Results Container -->
+        <div class="police-mesh-container" id="policeMeshContainer">
+          <div style="text-align: center; padding: 25px; color: var(--neon-cyan);">
+            <div style="font-size: 1.6rem; animation: pulse 1s infinite;">📡</div>
+            <p style="margin-top: 6px; font-size: 0.78rem;">Triangulating nearest police mesh stations...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions modal-actions-emergency">
+        <button type="button" class="btn-subtle" id="closeEmergencyModalBtn">Cancel</button>
+        <a href="tel:112" class="btn-call-112" id="call112Link">
+          <span>📞 Call 112 (National)</span>
+        </a>
+        <button type="button" class="btn-broadcast-sos" id="btnBroadcastSos">
+          <span class="sos-radar-ping"></span>
+          <span>🚨 BROADCAST EMERGENCY SOS</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Operator Profile & Session Modal -->
+  <div class="modal-backdrop" id="operatorProfileModal" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="avatar-circle-lg">👨‍✈️</div>
+          <div>
+            <h3 id="operatorModalHeading">Dispatcher Terminal Profile</h3>
+            <p class="modal-subtitle">Authorized Control Room Session · Delhi NCR Operations</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeOperatorModal" aria-label="Close Operator Modal">&times;</button>
+      </div>
+
+      <div class="operator-profile-body">
+        <div class="profile-hero-card">
+          <div class="profile-hero-info">
+            <h4 class="op-name">Alex Chen</h4>
+            <span class="role-badge">Senior Operations Dispatcher</span>
+            <p class="precinct-info">Terminal: <strong>TERM-DEL-01A</strong> · Sector: <strong>Delhi NCR Core</strong></p>
+          </div>
+          <span class="clearance-pill">Level 4 Clearance</span>
+        </div>
+
+        <div class="profile-stats-grid">
+          <div class="profile-stat-box">
+            <span class="stat-num" id="op-stat-shift">4h 24m</span>
+            <span class="stat-lbl">Active Shift Time</span>
+          </div>
+          <div class="profile-stat-box">
+            <span class="stat-num" id="op-stat-dispatched">48</span>
+            <span class="stat-lbl">Fleet Supervised</span>
+          </div>
+          <div class="profile-stat-box">
+            <span class="stat-num" id="op-stat-sla">98.5%</span>
+            <span class="stat-lbl">SLA Score</span>
+          </div>
+        </div>
+
+        <div class="operator-security-list">
+          <div class="security-item">
+            <span>🛡️ AI Emergency Routing Override:</span>
+            <strong style="color: var(--neon-mint);">Enabled (Full Authority)</strong>
+          </div>
+          <div class="security-item">
+            <span>📡 Police Mesh 112 Dispatch Sync:</span>
+            <strong style="color: var(--neon-cyan);">Active (Low-Latency)</strong>
+          </div>
+          <div class="security-item">
+            <span>🔒 Session Token:</span>
+            <strong style="color: var(--text-white); font-family: monospace;">AUTH-2026-DEL-899X</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-subtle" id="closeOperatorModalBtn">Done</button>
+        <button type="button" class="btn-optimize-glow" id="btnExportSessionLog">Export Shift Report</button>
+      </div>
     </div>
   </div>
 
@@ -1081,6 +1583,22 @@
     </div>
   </div>
 
+  <!-- Card Interactive Context Menu Dropdown -->
+  <div id="cardContextMenu" class="card-context-menu" hidden>
+    <button type="button" class="context-menu-item" data-action="refresh">
+      <span>🔄</span>
+      <span>Refresh Telemetry Stream</span>
+    </button>
+    <button type="button" class="context-menu-item" data-action="export">
+      <span>📥</span>
+      <span>Export Panel Metrics (JSON)</span>
+    </button>
+    <button type="button" class="context-menu-item" data-action="settings">
+      <span>⚙️</span>
+      <span>Configure Operational Thresholds</span>
+    </button>
+  </div>
+
   <!-- Notification Toast for AI Optimizer -->
   <div class="notification-toast" id="optToast" hidden>
     <div class="toast-icon">⚡</div>
@@ -1089,6 +1607,30 @@
       <p id="toastMessage">Recalculating multi-stop routes across Delhi NCR hubs...</p>
     </div>
   </div>
+
+  <!-- Mobile Bottom Navigation Bar (Visible only on mobile devices <= 768px) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Mobile Navigation">
+    <button type="button" class="mobile-nav-btn active" data-tab="dashboard" data-sub="map">
+      <span class="m-nav-icon">🗺️</span>
+      <span class="m-nav-label">Live Map</span>
+    </button>
+    <button type="button" class="mobile-nav-btn" data-tab="dashboard" data-sub="stats">
+      <span class="m-nav-icon">📊</span>
+      <span class="m-nav-label">Telemetry</span>
+    </button>
+    <button type="button" class="mobile-nav-btn" data-tab="orders">
+      <span class="m-nav-icon">📦</span>
+      <span class="m-nav-label">Orders</span>
+    </button>
+    <button type="button" class="mobile-nav-btn" data-tab="fleet">
+      <span class="m-nav-icon">🚚</span>
+      <span class="m-nav-label">Fleet</span>
+    </button>
+    <button type="button" class="mobile-nav-btn" data-tab="settings">
+      <span class="m-nav-icon">⚙️</span>
+      <span class="m-nav-label">Settings</span>
+    </button>
+  </nav>
 
   <!-- Leaflet Map Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
