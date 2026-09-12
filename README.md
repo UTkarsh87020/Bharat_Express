@@ -444,8 +444,8 @@ Broadcasts an emergency distress beacon across the dispatcher console.
 ### 1. Clone & Install
 ```bash
 # Clone the repository
-git clone https://github.com/UTkarsh87020/FastTrack-Delivery.git
-cd FastTrack-Delivery
+git clone https://github.com/UTkarsh87020/Bharat_Express.git
+cd Bharat_Express
 
 # Install production dependencies
 npm install
@@ -491,7 +491,7 @@ Dispatch operators can navigate the entire system without lifting their hands fr
 ## 📁 Project Directory Structure
 
 ```
-FastTrack-Delivery/
+Bharat_Express/
 ├── 🚀 server.js                  # Express API server with port fallback & dynamic routing
 ├── 🤖 ai-service.js              # Multi-algorithm AI route optimization engine
 ├── 🗺️ police-stations.js         # Delhi NCR police station directory & spatial geocoding

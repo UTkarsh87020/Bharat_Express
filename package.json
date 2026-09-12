@@ -1,7 +1,7 @@
 {
-  "name": "smart-delivery-app",
+  "name": "bharat-express",
   "version": "1.0.0",
-  "description": "Smart On-Demand Delivery App with Route Optimization",
+  "description": "Bharat Express - AI-Powered Smart Logistics & Autonomous Control Room",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
